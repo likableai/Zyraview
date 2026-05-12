@@ -1,4 +1,5 @@
 import { Suspense } from 'react';
+export const dynamic = 'force-dynamic';
 import { HomeHeroSection } from '@/components/home/HomeHeroSection';
 import { HomeMarketSection } from '@/components/home/HomeMarketSection';
 import { HomeEcosystemSection } from '@/components/home/HomeEcosystemSection';
