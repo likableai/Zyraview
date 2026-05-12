@@ -9,7 +9,7 @@ $env:NEXT_TELEMETRY_DISABLED = "1"
 $env:NODE_OPTIONS = "--no-warnings"
 
 # Start the development server and filter out Fast Refresh logs
-pnpm next dev --turbopack -p 8000 2>&1 | Where-Object {
+pnpm next dev -p 8000 --webpack 2>&1 | Where-Object {
     $_ -notmatch "\[Fast Refresh\]" -and
     $_ -notmatch "turbopack-hot-reloader" -and
     $_ -notmatch "report-hmr-latency" -and
