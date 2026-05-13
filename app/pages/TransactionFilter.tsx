@@ -259,7 +259,7 @@ const TransactionsFilter: React.FC = () => {
   };
 
   return (
-    <div className="transactions-filter-page">
+    <div className="transactions-filter-page px-4 sm:px-6 lg:px-8">
       <Card className="mb-4">
         <CardContent className="p-6">
           <h5 className="text-lg font-medium mb-4">{String(t("transactions_filter.filter_options", { defaultValue: "Filter Options" }))}</h5>

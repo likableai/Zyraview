@@ -28,7 +28,7 @@ export async function HomeTopWalletsSection() {
   const totalBalance = wallets.reduce((s, w) => s + (w.balance || 0), 0);
 
   return (
-    <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+    <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       <Card className="lg:col-span-2 border-border/60 bg-card/40">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5 flex-row items-center justify-between">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
@@ -55,7 +55,7 @@ export async function HomeTopWalletsSection() {
                 {wallets.map((w, i) => (
                   <TableRow key={w.identifier}>
                     <TableCell className="text-xs text-muted-foreground font-mono">{i + 1}</TableCell>
-                    <TableCell className="max-w-[180px] sm:max-w-[220px] truncate">
+                    <TableCell className="max-w-[120px] sm:max-w-[220px] truncate">
                       <div className="flex items-center gap-1.5">
                         <Link href={`/account/${w.identifier}`} className="text-primary hover:underline text-xs sm:text-sm font-medium truncate">
                           {w.name}

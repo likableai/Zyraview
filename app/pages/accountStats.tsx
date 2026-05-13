@@ -11,6 +11,8 @@ import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { RefreshCw, TrendingUp, Users, Coins, Activity, Zap } from "lucide-react";
 import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import PriceChart from "@/components/charts/PriceChart";
+import { usePriceHistory } from "@/lib/use-chart-data";
 
 const AccountStats: React.FC = () => {
   const { t, language } = useLanguage();
@@ -21,6 +23,8 @@ const AccountStats: React.FC = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [lastUpdated, setLastUpdated] = useState(new Date());
+  const [priceRange, setPriceRange] = useState<'1d' | '7d' | '30d' | '90d'>('7d');
+  const { priceHistory, loading: chartLoading } = usePriceHistory(priceRange);
 
   // Local state for data
   const [piPrice, setPiPrice] = useState(2.0);
@@ -171,7 +175,7 @@ const AccountStats: React.FC = () => {
     <div className="min-h-screen bg-background p-4 pb-20">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between flex-wrap gap-2 mb-6">
           <div>
             <h1 className="text-2xl font-bold text-foreground mb-2">
               {t('account_stats.heading')}
@@ -246,6 +250,41 @@ const AccountStats: React.FC = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Price Chart */}
+        <Card className="mb-8">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center">
+                <TrendingUp className="h-5 w-5 mr-2" />
+                Pi Price Chart
+              </CardTitle>
+              <div className="flex gap-1">
+                {(['1d', '7d', '30d', '90d'] as const).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setPriceRange(r)}
+                    className={`px-2 py-1 text-xs rounded ${
+                      priceRange === r
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <PriceChart
+              data={priceHistory}
+              height={350}
+              loading={chartLoading}
+              legend={`Pi/USD — ${priceRange}`}
+            />
+          </CardContent>
+        </Card>
 
         {/* Top Accounts */}
         <Card className="mb-8">

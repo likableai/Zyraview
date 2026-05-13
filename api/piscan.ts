@@ -1,5 +1,5 @@
 
-export const BASE_URL_API = 'https://oracle-three-xi.vercel.app';
+export const BASE_URL_API = 'https://www.zyrachain.org';
 export const PiscanAPI={
     TopAccount:BASE_URL_API+'/top-accounts',
     AccountsDistribution:BASE_URL_API+'/accounts/distribution',

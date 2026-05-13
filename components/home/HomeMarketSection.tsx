@@ -26,7 +26,7 @@ export async function HomeMarketSection() {
   const fmtFull = (n: number) => n.toLocaleString('en-US', { maximumFractionDigits: 0 });
 
   return (
-    <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+    <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Price Card — prominent */}
       <Card className="lg:col-span-1 border-border/60 bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-950/10 dark:to-green-950/10">
         <CardContent className="p-4 sm:p-5">

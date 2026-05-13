@@ -109,7 +109,7 @@ export default function DocsPage() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-5">
+          <TabsList className="flex flex-wrap sm:grid sm:w-full sm:grid-cols-5">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="services">Services</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
@@ -119,7 +119,7 @@ export default function DocsPage() {
 
           {/* Overview Tab */}
           <TabsContent value="overview" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ServiceCard
                 icon={BarChart3}
                 title="Blockchain Explorer"
@@ -155,7 +155,7 @@ export default function DocsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="text-center p-4 border rounded-lg">
                     <div className="bg-emerald-500/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
                       <Eye className="h-6 w-6 text-emerald-600" />
@@ -190,7 +190,7 @@ export default function DocsPage() {
 
           {/* Services Tab */}
           <TabsContent value="services" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ServiceCard
                 icon={Search}
                 title="Blockchain Explorer"
@@ -278,7 +278,7 @@ export default function DocsPage() {
 
           {/* Features Tab */}
           <TabsContent value="features" className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center">
@@ -370,7 +370,7 @@ export default function DocsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <h4 className="font-semibold">For Users</h4>
                     <div className="space-y-3">
@@ -424,7 +424,7 @@ export default function DocsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div className="p-4 border rounded-lg">
                     <h4 className="font-semibold mb-2">Tokenization</h4>
                     <p className="text-sm text-muted-foreground mb-3">
@@ -473,7 +473,7 @@ export default function DocsPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center">

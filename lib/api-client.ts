@@ -248,6 +248,28 @@ export class ApiClient {
   async getHealth(): Promise<ApiResponse> {
     return this.request('/health');
   }
+
+  // ---- Chart data endpoints ----
+
+  /** Price history (OHLC) for TradingView charts */
+  async getPriceHistory(range: '1d' | '7d' | '30d' | '90d' = '7d'): Promise<ApiResponse> {
+    return this.request(`/api/charts/price-history?range=${range}`);
+  }
+
+  /** Balance history for a specific wallet address */
+  async getBalanceHistory(address: string): Promise<ApiResponse> {
+    return this.request(`/api/pct-monitor/balance-history/${address}`);
+  }
+
+  /** Aggregate balance history for CEX wallets */
+  async getCexAggregateBalanceHistory(range: '1d' | '7d' | '30d' = '7d'): Promise<ApiResponse> {
+    return this.request(`/api/cex-monitor/aggregate-balance-history?range=${range}`);
+  }
+
+  /** Aggregate balance history for PCT wallets */
+  async getPctAggregateBalanceHistory(range: '1d' | '7d' | '30d' = '7d'): Promise<ApiResponse> {
+    return this.request(`/api/pct-monitor/aggregate-balance-history?range=${range}`);
+  }
 }
 
 // Create and export a singleton instance

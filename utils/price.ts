@@ -1,16 +1,18 @@
-export const fetchPiPrice = async () => {
+let lastGoodPrice: number | null = null;
+
+export const fetchPiPrice = async (): Promise<number | null> => {
     try {
-      // Fetch from OKX API
-      const response = await fetch('https://api.piscan.io/data/pi-price');
+      const response = await fetch('https://www.zyrachain.org/data/pi-price');
       if (response.ok) {
         const data = await response.json();
         if (data && data.data && data.data[0]) {
-           return parseFloat(data.data[0].idxPx)
+           const price = parseFloat(data.data[0].idxPx);
+           if (price > 0) lastGoodPrice = price;
+           return price;
         }
       }
     } catch (error) {
       console.error("Failed to fetch Pi price:", error);
-      // Keep using default price if fetch fails
-      return 2;
     }
+    return lastGoodPrice;
   };

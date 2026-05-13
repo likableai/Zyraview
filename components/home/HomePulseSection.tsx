@@ -27,7 +27,7 @@ export async function HomePulseSection() {
   const fmt = (n: number) => n.toLocaleString(undefined, { maximumFractionDigits: 4 });
 
   return (
-    <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+    <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Core Team Flow */}
       <Card className="border-border/60 bg-card/40">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
@@ -88,7 +88,7 @@ export async function HomePulseSection() {
               {d.largestMoves24h.slice(0, 7).map((m, idx) => (
                 <div key={`${m.wallet}-${idx}`} className="flex items-center justify-between gap-2 py-1 border-b border-border/20 last:border-0">
                   <div className="flex items-center gap-1.5 min-w-0">
-                    <span className="text-xs font-mono truncate max-w-[130px]">{m.wallet}</span>
+                    <span className="text-xs font-mono truncate max-w-[100px] sm:max-w-[160px]">{m.wallet}</span>
                     <Link href={`/account/${m.wallet}`} className="shrink-0 text-muted-foreground hover:text-primary">
                       <ExternalLink className="h-3 w-3" />
                     </Link>

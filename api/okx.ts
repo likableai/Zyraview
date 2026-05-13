@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const BASE_URL_OKX = 'https://oracle-three-xi.vercel.app';
-const PRICE_TTL_MS = 600_000; // 10 minutes
+const BASE_URL_OKX = 'https://www.zyrachain.org';
+const PRICE_TTL_MS = 30_000; // 30 seconds
 const LS_KEY = 'okx_market';
 
 type MarketData = {
@@ -89,10 +89,10 @@ export const okx = {
       if (ls) return ls.data;
       // 5) Ultimate default if nothing cached exists yet
       return {
-        idxPx: '2.0',
-        high24h: '2.0',
-        open24h: '2.0',
-        low24h: '2.0',
+        idxPx: '0',
+        high24h: '0',
+        open24h: '0',
+        low24h: '0',
       };
     }
   }

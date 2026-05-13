@@ -12,6 +12,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useLanguage } from '@/context/languagecontext';
+import BalanceHistoryChart from '@/components/charts/BalanceHistoryChart';
+import { useAggregateBalanceHistory } from '@/lib/use-chart-data';
 
 interface SummaryData {
   walletsTracked: number;
@@ -87,6 +89,8 @@ export default function PctWalletMonitorPage() {
   const [historyRows, setHistoryRows] = useState<ChangeRow[]>([]);
   const [historyCursor, setHistoryCursor] = useState<string | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
+  const [balanceRange, setBalanceRange] = useState<'1d' | '7d' | '30d'>('7d');
+  const { aggregateHistory, loading: aggLoading } = useAggregateBalanceHistory('pct', balanceRange);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -199,13 +203,36 @@ export default function PctWalletMonitorPage() {
             <p className="text-destructive text-sm mb-4">{summaryErr}</p>
           )}
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-10">
+          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
             <StatCard label={tStr('pct.stat_tracked')} value={fmtInt(summary?.walletsTracked)} accent="neutral" />
             <StatCard label={tStr('pct.stat_starting')} value={fmtPi(summary?.startingBalance ?? null)} accent="green" />
             <StatCard label={tStr('pct.stat_current')} value={fmtPi(summary?.currentBalance ?? null)} accent="green" />
             <StatCard label={tStr('pct.stat_changes')} value={fmtInt(summary?.confirmedChanges)} accent="neutral" />
             <StatCard label={tStr('pct.stat_total_out')} value={fmtPi(summary?.totalOut ?? null)} accent="red" />
             <StatCard label={tStr('pct.stat_24h')} value={fmtPi(summary?.netChange24h ?? null)} accent="mixed" val={summary?.netChange24h} />
+          </div>
+
+          {/* Balance Trend Chart */}
+          <div className="rounded-xl border border-border bg-card/95 p-4 mb-6">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-foreground">Balance Trend</h3>
+              <div className="flex gap-1">
+                {(['1d', '7d', '30d'] as const).map((r) => (
+                  <button
+                    key={r}
+                    onClick={() => setBalanceRange(r)}
+                    className={`px-2 py-1 text-xs rounded ${
+                      balanceRange === r
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <BalanceHistoryChart data={aggregateHistory} color="#22c55e" height={200} loading={aggLoading} />
           </div>
 
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">

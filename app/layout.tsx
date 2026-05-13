@@ -46,7 +46,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <NavbarWithMobile />
                     <GlobalMobileElements />
                     <div className="flex min-h-screen flex-col">
-                      <main className="flex-1 pb-safe-area-mobile">
+                      <main className="flex-1 pb-safe-area-mobile lg:pb-0">
                         {children}
                       </main>
                       <GlobalFooter />

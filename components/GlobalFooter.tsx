@@ -19,7 +19,7 @@ import {
 
 const GlobalFooter: React.FC = () => {
   return (
-    <footer className="hidden lg:block border-t border-border bg-background">
+    <footer className="block border-t border-border bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Main Footer Content */}
         <div className="py-12">

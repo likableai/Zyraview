@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL_SOCIALCHAIN = 'https://oracle-three-xi.vercel.app';
+const BASE_URL_SOCIALCHAIN = 'https://www.zyrachain.org';
 
 const api = axios.create({
   baseURL: BASE_URL_SOCIALCHAIN,

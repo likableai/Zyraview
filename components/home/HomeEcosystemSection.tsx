@@ -27,7 +27,7 @@ export async function HomeEcosystemSection() {
     .slice(0, 8);
 
   return (
-    <section className="grid gap-3 sm:gap-4 lg:grid-cols-3">
+    <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Stats summary */}
       <Card className="lg:col-span-1 border-border/60 bg-card/40">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
