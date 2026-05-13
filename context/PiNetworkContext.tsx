@@ -123,7 +123,7 @@ export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
       
       // Initialize Pi SDK directly
       console.log('📦 Initializing Pi SDK...');
-      (window as any).Pi.init({ version: "2.0" });
+      (window as any).Pi.init({ version: "2.0", sandbox: true });
       
       // Handle incomplete payments callback
       const onIncompletePaymentFound = (payment: any) => {

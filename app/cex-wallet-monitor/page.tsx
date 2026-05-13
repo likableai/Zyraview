@@ -179,66 +179,64 @@ export default function CexWalletMonitorPage() {
   return (
     <div className="pct-monitor min-h-screen bg-background text-foreground font-mono selection:bg-primary/20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-28">
-        <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0 mb-6">
-            {(['wallets', 'updates', 'history'] as const).map((v) => (
-              <TabsTrigger
-                key={v}
-                value={v}
-                className={
-                  'rounded-full px-4 py-2 text-sm border transition-colors data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-accent data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground hover:bg-accent/60'
-                }
-              >
-                {v === 'wallets' ? tStr('cex_monitor.tab_wallets') : v === 'updates' ? tStr('cex_monitor.tab_updates') : tStr('cex_monitor.tab_history')}
-              </TabsTrigger>
-            ))}
-          </TabsList>
 
-          <h1 className="text-2xl sm:text-3xl font-bold text-primary tracking-tight mb-1">
-            {tStr('cex_monitor.title')}
-          </h1>
-          <p className="text-sm text-muted-foreground mb-8">{tStr('cex_monitor.subtitle')}</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-primary tracking-tight mb-1">
+          {tStr('cex_monitor.title')}
+        </h1>
+        <p className="text-sm text-muted-foreground mb-6">{tStr('cex_monitor.subtitle')}</p>
 
-          {summaryErr && (
-            <p className="text-destructive text-sm mb-4">{summaryErr}</p>
-          )}
+        {summaryErr && <p className="text-destructive text-sm mb-4">{summaryErr}</p>}
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
-            <StatCard label={tStr('cex_monitor.stat_tracked')} value={fmtInt(summary?.walletsTracked)} accent="neutral" />
-            <StatCard label={tStr('cex_monitor.stat_starting')} value={fmtPi(summary?.startingBalance ?? null)} accent="green" />
-            <StatCard label={tStr('cex_monitor.stat_current')} value={fmtPi(summary?.currentBalance ?? null)} accent="green" />
-            <StatCard label={tStr('cex_monitor.stat_changes')} value={fmtInt(summary?.confirmedChanges)} accent="neutral" />
-            <StatCard label={tStr('cex_monitor.stat_total_out')} value={fmtPi(summary?.totalOut ?? null)} accent="red" />
-            <StatCard label={tStr('cex_monitor.stat_24h')} value={fmtPi(summary?.netChange24h ?? null)} accent="mixed" val={summary?.netChange24h} />
-          </div>
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 mb-6">
+          <StatCard label={tStr('cex_monitor.stat_tracked')} value={fmtInt(summary?.walletsTracked)} accent="neutral" />
+          <StatCard label={tStr('cex_monitor.stat_starting')} value={fmtPi(summary?.startingBalance ?? null)} accent="green" />
+          <StatCard label={tStr('cex_monitor.stat_current')} value={fmtPi(summary?.currentBalance ?? null)} accent="green" />
+          <StatCard label={tStr('cex_monitor.stat_changes')} value={fmtInt(summary?.confirmedChanges)} accent="neutral" />
+          <StatCard label={tStr('cex_monitor.stat_total_out')} value={fmtPi(summary?.totalOut ?? null)} accent="red" />
+          <StatCard label={tStr('cex_monitor.stat_24h')} value={fmtPi(summary?.netChange24h ?? null)} accent="mixed" val={summary?.netChange24h} />
+        </div>
 
-          {/* Balance Trend Chart */}
-          <div className="rounded-xl border border-border bg-card/95 p-4 mb-6">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="text-sm font-semibold text-foreground">Balance Trend</h3>
-              <div className="flex gap-1">
-                {(['1d', '7d', '30d'] as const).map((r) => (
-                  <button
-                    key={r}
-                    onClick={() => setBalanceRange(r)}
-                    className={`px-2 py-1 text-xs rounded ${
-                      balanceRange === r
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
-                  >
-                    {r}
-                  </button>
-                ))}
-              </div>
+        {/* Balance Trend Chart — separate section */}
+        <div className="rounded-xl border border-border/60 bg-card/95 overflow-hidden mb-8">
+          <div className="flex items-center justify-between px-4 sm:px-6 pt-4 pb-2">
+            <h3 className="text-sm font-semibold text-foreground">Balance Trend</h3>
+            <div className="flex gap-1">
+              {(['1d', '7d', '30d'] as const).map((r) => (
+                <button
+                  key={r}
+                  onClick={() => setBalanceRange(r)}
+                  className={`px-3 py-1 text-xs font-medium rounded-md transition-colors ${
+                    balanceRange === r
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`}
+                >
+                  {r}
+                </button>
+              ))}
             </div>
-            <BalanceHistoryChart data={aggregateHistory} color="#f59e0b" height={200} loading={aggLoading} />
           </div>
+          <div className="px-0">
+            <BalanceHistoryChart data={aggregateHistory} color="#f59e0b" height={220} loading={aggLoading} />
+          </div>
+        </div>
 
+        {/* Tabs section */}
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
-            <h2 className="text-lg font-semibold text-primary">
-              {tab === 'history' ? tStr('cex_monitor.section_history') : tab === 'updates' ? tStr('cex_monitor.section_updates') : tStr('cex_monitor.section_wallets')}
-            </h2>
+            <TabsList className="flex flex-wrap gap-2 bg-transparent border-0 p-0">
+              {(['wallets', 'updates', 'history'] as const).map((v) => (
+                <TabsTrigger
+                  key={v}
+                  value={v}
+                  className={
+                    'rounded-full px-4 py-2 text-sm border transition-colors data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:bg-accent data-[state=inactive]:border-border data-[state=inactive]:text-muted-foreground hover:bg-accent/60'
+                  }
+                >
+                  {v === 'wallets' ? tStr('cex_monitor.tab_wallets') : v === 'updates' ? tStr('cex_monitor.tab_updates') : tStr('cex_monitor.tab_history')}
+                </TabsTrigger>
+              ))}
+            </TabsList>
             <p className="text-xs text-muted-foreground">
               {tStr('cex_monitor.latest_check')}{' '}
               <span className="text-foreground">{fmtUtc(summary?.latestCheck ?? null)}</span>
@@ -254,52 +252,25 @@ export default function CexWalletMonitorPage() {
               <ul className="divide-y divide-border/70 max-h-[560px] overflow-y-auto">
                 {(walletData?.wallets ?? []).map((w) => (
                   <li key={w.identifier} className="hover:bg-accent/40">
-                    <Link
-                      href={`/account/${w.identifier}`}
-                      className="flex flex-col sm:flex-row sm:items-center gap-1 px-4 py-3 text-primary hover:underline"
-                    >
+                    <Link href={`/account/${w.identifier}`} className="flex flex-col sm:flex-row sm:items-center gap-1 px-4 py-3 text-primary hover:underline">
                       <span className="hidden sm:inline text-xs text-muted-foreground break-all">{w.identifier}</span>
                       <span className="sm:hidden text-sm">{w.walletShort}</span>
                       <span className="hidden sm:inline text-sm">{w.walletShort}</span>
-                      {w.lastBalance != null && (
-                        <span className="sm:ml-auto text-[11px] text-muted-foreground whitespace-nowrap">
-                          {fmtPi(w.lastBalance)}
-                        </span>
-                      )}
+                      {w.lastBalance != null && <span className="sm:ml-auto text-[11px] text-muted-foreground whitespace-nowrap">{fmtPi(w.lastBalance)}</span>}
                     </Link>
                   </li>
                 ))}
               </ul>
               {walletData && walletData.totalPages > 1 && (
                 <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-t border-border text-sm">
-                  <button
-                    type="button"
-                    disabled={walletPage <= 1}
-                    onClick={() => setWalletPage((p) => Math.max(1, p - 1))}
-                    className="text-primary disabled:opacity-40"
-                  >
-                    {tStr('cex_monitor.prev')}
-                  </button>
-                  <span className="text-foreground">
-                    {walletPage} / {walletData.totalPages}
-                  </span>
-                  <button
-                    type="button"
-                    disabled={walletPage >= walletData.totalPages}
-                    onClick={() => setWalletPage((p) => p + 1)}
-                    className="text-primary disabled:opacity-40"
-                  >
-                    {tStr('cex_monitor.next')}
-                  </button>
-                  <span className="text-muted-foreground text-xs ml-auto">
-                    {fmtInt(walletData.total)} {tStr('cex_monitor.wallets_index')}
-                  </span>
+                  <button type="button" disabled={walletPage <= 1} onClick={() => setWalletPage((p) => Math.max(1, p - 1))} className="text-primary disabled:opacity-40">{tStr('cex_monitor.prev')}</button>
+                  <span className="text-foreground">{walletPage} / {walletData.totalPages}</span>
+                  <button type="button" disabled={walletPage >= walletData.totalPages} onClick={() => setWalletPage((p) => p + 1)} className="text-primary disabled:opacity-40">{tStr('cex_monitor.next')}</button>
+                  <span className="text-muted-foreground text-xs ml-auto">{fmtInt(walletData.total)} {tStr('cex_monitor.wallets_index')}</span>
                 </div>
               )}
             </div>
-            <p className="mt-4 text-center text-xs text-muted-foreground">
-              {tStr('cex_monitor.footer_note')}
-            </p>
+            <p className="mt-4 text-center text-xs text-muted-foreground">{tStr('cex_monitor.footer_note')}</p>
           </TabsContent>
 
           <TabsContent value="updates" className="mt-0">
@@ -310,12 +281,7 @@ export default function CexWalletMonitorPage() {
             <ChangesTable rows={historyRows} changeCellClass={changeCellClass} tr={tStr} />
             <div className="flex justify-center mt-4">
               {historyCursor && (
-                <button
-                  type="button"
-                  disabled={historyLoading}
-                  onClick={() => loadHistory(historyCursor, true)}
-                  className="rounded-full border border-border px-4 py-2 text-sm text-primary hover:bg-accent"
-                >
+                <button type="button" disabled={historyLoading} onClick={() => loadHistory(historyCursor, true)} className="rounded-full border border-border px-4 py-2 text-sm text-primary hover:bg-accent">
                   {historyLoading ? tStr('cex_monitor.loading') : tStr('cex_monitor.load_more')}
                 </button>
               )}
