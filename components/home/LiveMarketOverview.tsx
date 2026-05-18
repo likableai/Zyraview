@@ -42,7 +42,7 @@ export function LiveMarketOverview({ initial }: { initial: HeroData }) {
 
     async function poll() {
       try {
-        const res = await fetch('/api/v2/home/hero', { cache: 'no-store' });
+        const res = await fetch('/api/v2/home/hero?fresh=1', { cache: 'no-store' });
         const json = await res.json();
         if (json.success && json.data && mounted.current) {
           setData({
