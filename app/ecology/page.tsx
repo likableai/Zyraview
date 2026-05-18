@@ -121,10 +121,10 @@ const getInfluencerCategoryColor = (category: string) => {
 
 const getEngagementColor = (engagement: string) => {
   switch (engagement) {
-    case 'Very High': return 'text-green-600 bg-green-100 dark:bg-green-900/20';
-    case 'High': return 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/20';
-    case 'Medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20';
-    default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20';
+    case 'Very High': return 'text-green-600 bg-green-100 dark:bg-green-900/20 dark:text-green-400';
+    case 'High': return 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400';
+    case 'Medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400';
+    default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400';
   }
 };
 
@@ -529,7 +529,7 @@ const EventsTab = () => {
             <div key={event.id} className="relative flex items-start mb-6 sm:mb-8">
               {/* Timeline Dot */}
               <div className={`absolute left-4 sm:left-6 w-4 h-4 rounded-full border-2 border-background ${
-                event.type === 'upcoming' ? 'bg-emerald-500' : 'bg-gray-400'
+                event.type === 'upcoming' ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-gray-400 dark:bg-gray-500'
               } z-10`}></div>
               
               {/* Event Content */}
@@ -584,13 +584,13 @@ const EventsTab = () => {
                   {event.achievements && event.achievements.length > 0 && (
                     <div className="mb-3 sm:mb-4">
                       <h4 className="font-semibold text-xs sm:text-sm text-foreground mb-2 flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-yellow-500" />
+                        <Trophy className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
                         Key Achievements
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {event.achievements.map((achievement, idx) => (
                           <div key={`achievement-${event.id}-${idx}`} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-1.5 flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 dark:bg-yellow-400 mt-1.5 flex-shrink-0"></div>
                             <span>{achievement}</span>
                           </div>
                         ))}
@@ -605,7 +605,7 @@ const EventsTab = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {event.highlights.map((highlight, idx) => (
                           <div key={`highlight-${event.id}-${idx}`} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-1.5 flex-shrink-0"></div>
                             <span>{highlight}</span>
                           </div>
                         ))}
@@ -763,8 +763,8 @@ const HackathonsTab = () => {
             <div key={hackathon.id} className="relative flex items-start mb-6 sm:mb-8">
               {/* Timeline Dot */}
               <div className={`absolute left-4 sm:left-6 w-4 h-4 rounded-full border-2 border-background ${
-                hackathon.status === 'ongoing' ? 'bg-green-500' : 
-                hackathon.status === 'upcoming' ? 'bg-emerald-500' : 'bg-gray-400'
+                hackathon.status === 'ongoing' ? 'bg-green-500 dark:bg-green-400' : 
+                hackathon.status === 'upcoming' ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-gray-400 dark:bg-gray-500'
               } z-10`}></div>
               
               {/* Hackathon Content */}
@@ -831,13 +831,13 @@ const HackathonsTab = () => {
                   {hackathon.winners && hackathon.winners.length > 0 && (
                     <div className="mb-3 sm:mb-4">
                       <h4 className="font-semibold text-xs sm:text-sm text-foreground mb-2 flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-yellow-500" />
+                        <Trophy className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
                         Winners & Results
                       </h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {hackathon.winners.map((winner, idx) => (
                           <div key={`winner-${hackathon.id}-${idx}`} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-1.5 flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 dark:bg-yellow-400 mt-1.5 flex-shrink-0"></div>
                             <span>{winner}</span>
                           </div>
                         ))}
@@ -852,7 +852,7 @@ const HackathonsTab = () => {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {hackathon.highlights.map((highlight, idx) => (
                           <div key={`highlight-${hackathon.id}-${idx}`} className="text-xs sm:text-sm text-muted-foreground flex items-start gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 flex-shrink-0"></div>
+                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-1.5 flex-shrink-0"></div>
                             <span>{highlight}</span>
                           </div>
                         ))}
@@ -1123,10 +1123,10 @@ function EcologyContent() {
     <div className="min-h-screen bg-background container mx-auto px-4 sm:px-6 py-6 sm:py-8 pb-28">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-foreground mb-2 sm:mb-4 px-2">
             Pi Network Ecology
           </h1>
-          <p className="text-sm sm:text-base lg:text-lg text-gray-600 px-4">
+          <p className="text-sm sm:text-base lg:text-lg text-muted-foreground px-4">
             Explore the vibrant Pi Network ecosystem - communities, events, hackathons, and influencers
           </p>
         </div>

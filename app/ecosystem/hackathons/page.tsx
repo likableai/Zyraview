@@ -217,8 +217,8 @@ export default function HackathonsPage() {
               <div key={hackathon.id} className="relative flex items-start mb-8">
                 {/* Timeline Dot */}
                 <div className={`absolute left-6 w-4 h-4 rounded-full border-2 border-background ${
-                  hackathon.status === 'ongoing' ? 'bg-green-500' : 
-                  hackathon.status === 'upcoming' ? 'bg-emerald-500' : 'bg-gray-400'
+                  hackathon.status === 'ongoing' ? 'bg-green-500 dark:bg-green-400' : 
+                  hackathon.status === 'upcoming' ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-gray-400 dark:bg-gray-500'
                 } z-10`}></div>
                 
                 {/* Hackathon Content */}
@@ -285,13 +285,13 @@ export default function HackathonsPage() {
                     {hackathon.winners && hackathon.winners.length > 0 && (
                       <div className="mb-4">
                         <h4 className="font-semibold text-sm text-foreground mb-2 flex items-center gap-2">
-                          <Trophy className="w-4 h-4 text-yellow-500" />
+                          <Trophy className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
                           Winners & Results
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {hackathon.winners.map((winner, idx) => (
                             <div key={`winner-${hackathon.id}-${idx}`} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-2 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 dark:bg-yellow-400 mt-2 flex-shrink-0"></div>
                               {winner}
                             </div>
                           ))}
@@ -306,7 +306,7 @@ export default function HackathonsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {hackathon.highlights.map((highlight, idx) => (
                             <div key={`highlight-${hackathon.id}-${idx}`} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-2 flex-shrink-0"></div>
                               {highlight}
                             </div>
                           ))}

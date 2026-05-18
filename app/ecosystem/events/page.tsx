@@ -230,7 +230,7 @@ export default function EventsPage() {
               <div key={event.id} className="relative flex items-start mb-8">
                 {/* Timeline Dot */}
                 <div className={`absolute left-6 w-4 h-4 rounded-full border-2 border-background ${
-                  event.type === 'upcoming' ? 'bg-emerald-500' : 'bg-gray-400'
+                  event.type === 'upcoming' ? 'bg-emerald-500 dark:bg-emerald-400' : 'bg-gray-400 dark:bg-gray-500'
                 } z-10`}></div>
                 
                 {/* Event Content */}
@@ -285,13 +285,13 @@ export default function EventsPage() {
                     {event.achievements && event.achievements.length > 0 && (
                       <div className="mb-4">
                         <h4 className="font-semibold text-sm text-foreground mb-2 flex items-center gap-2">
-                          <Trophy className="w-4 h-4 text-yellow-500" />
+                          <Trophy className="w-4 h-4 text-yellow-500 dark:text-yellow-400" />
                           Key Achievements
                         </h4>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {event.achievements.map((achievement, idx) => (
                             <div key={`achievement-${event.id}-${idx}`} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 mt-2 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500 dark:bg-yellow-400 mt-2 flex-shrink-0"></div>
                               {achievement}
                             </div>
                           ))}
@@ -306,7 +306,7 @@ export default function EventsPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                           {event.highlights.map((highlight, idx) => (
                             <div key={`highlight-${event.id}-${idx}`} className="text-sm text-muted-foreground flex items-start gap-2">
-                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 flex-shrink-0"></div>
+                              <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 mt-2 flex-shrink-0"></div>
                               {highlight}
                             </div>
                           ))}

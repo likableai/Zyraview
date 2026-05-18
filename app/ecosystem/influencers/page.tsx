@@ -84,10 +84,10 @@ export default function InfluencersPage() {
 
   const getEngagementColor = (engagement: string) => {
     switch (engagement) {
-      case 'Very High': return 'text-green-600 bg-green-100 dark:bg-green-900/20';
-      case 'High': return 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/20';
-      case 'Medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20';
-      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20';
+      case 'Very High': return 'text-green-600 bg-green-100 dark:bg-green-900/20 dark:text-green-400';
+      case 'High': return 'text-emerald-600 bg-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400';
+      case 'Medium': return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/20 dark:text-yellow-400';
+      default: return 'text-gray-600 bg-gray-100 dark:bg-gray-900/20 dark:text-gray-400';
     }
   };
 

@@ -224,7 +224,7 @@ export default function CommunitiesPage() {
       <Card className="bg-card/80 backdrop-blur-sm border border-border/50">
         <CardHeader>
           <CardTitle className="flex items-center text-xl font-heading">
-            <Users className="h-5 w-5 mr-2 text-emerald-600" />
+            <Users className="h-5 w-5 mr-2 text-emerald-600 dark:text-emerald-400" />
             Pi Network Communities ({filteredCommunities.length})
           </CardTitle>
         </CardHeader>
