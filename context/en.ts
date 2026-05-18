@@ -1,4 +1,4 @@
-﻿export const language_en={
+export const language_en={
     'nav.home': 'Home',
     'nav.cexs': 'CEXs & Core Team',
     'nav.operations': 'Operations',

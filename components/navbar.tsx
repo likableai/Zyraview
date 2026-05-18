@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 import React, { useState, useRef, useEffect } from "react";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { FiX } from "react-icons/fi";
-import { BookOpen, Users, Plug, Menu, CheckCircle, LayoutGrid, Wallet, Layers, ArrowLeftRight, Activity, Coins, Droplets, TrendingUp, ChevronDown } from "lucide-react";
+import { BookOpen, Users, Plug, Menu, CheckCircle, LayoutGrid, Wallet, Layers, ArrowLeftRight, Activity, Coins, Droplets, TrendingUp, ChevronDown, BarChart3 } from "lucide-react";
 import { useLanguage } from "@/context/languagecontext";
 import { usePiNetwork } from "@/context/PiNetworkContext";
 import Logo from './logo';

@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import "./globals.css";
 import GlobalFooter from "@/components/GlobalFooter";
 import { PageMetadataProvider } from "@/context/pagemetadataContext";

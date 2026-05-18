@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -65,7 +65,7 @@ export default function ApiDashboardPage() {
     setDescription('Manage your Oracle API keys, view usage statistics, and monitor rate limits.');
   }, [setHeading, setTitle, setDescription]);
 
-  const getAuth = useCallback(() => {
+  const getAuth = useCallback((): Record<string, string> => {
     const token = localStorage.getItem('pi_access_token');
     return token ? { Authorization: `Bearer ${token}` } : {};
   }, []);

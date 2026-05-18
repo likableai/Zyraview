@@ -1,4 +1,4 @@
-﻿// Pi Network Backend Service - Following Official Pi Network SDK Guidelines
+// Pi Network Backend Service - Following Official Pi Network SDK Guidelines
 import { 
   PaymentDTO, 
 } from '../types/index';

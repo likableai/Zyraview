@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const SERVER_URL = process.env.SERVER_URL || 'https://Zyrachain-server.onrender.com';
 
