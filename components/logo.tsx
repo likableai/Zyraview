@@ -19,8 +19,8 @@ const Logo: React.FC<LogoProps> = ({ className = '', size = 'md', showText = tru
       {/* Zyrachain Logo Image */}
       <div className={`${sizeClasses[size]} relative`}>
         <Image
-          src="/dappify-logo.png"
-          alt="Dappify Logo"
+          src="/ZYRACHAIN-logo.png"
+          alt="Zyrachain Logo"
           width={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
           height={size === 'sm' ? 24 : size === 'md' ? 32 : 48}
           className="object-contain"
