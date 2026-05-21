@@ -20,7 +20,13 @@ type HeroData = {
 const POLL_MS = 5000;
 
 function fmtUsd(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(n);
+}
+
+function fmtMC(n: number) {
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 }
 
 function fmtB(n: number) {
@@ -101,11 +107,11 @@ export function LiveMarketOverview({ initial }: { initial: HeroData }) {
           <div className="mt-3 pt-3 border-t border-border/40 grid grid-cols-2 gap-2 text-xs">
             <div>
               <span className="text-muted-foreground">Market Cap</span>
-              <p className="font-semibold text-foreground">{fmtUsd(d.market_cap_usd)}</p>
+              <p className="font-semibold text-foreground">{fmtMC(d.market_cap_usd)}</p>
             </div>
             <div>
               <span className="text-muted-foreground">FDV</span>
-              <p className="font-semibold text-foreground">{fmtUsd(d.fdv_usd)}</p>
+              <p className="font-semibold text-foreground">{fmtMC(d.fdv_usd)}</p>
             </div>
           </div>
         </CardContent>

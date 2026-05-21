@@ -28,7 +28,13 @@ const metricConfig = [
 const POLL_MS = 5000;
 
 function fmtUsd(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(n);
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(n);
+}
+
+function fmtMC(n: number) {
+  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
+  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
 }
 
 function fmtB(n: number) {
@@ -83,7 +89,7 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
     supply: fmtB(d.total_supply),
     locked: fmtB(d.total_locked),
     tps: typeof d.tps === 'number' ? d.tps.toFixed(2) : '\u2014',
-    mcap: d.market_cap_usd ? fmtUsd(d.market_cap_usd) : '\u2014',
+    mcap: d.market_cap_usd ? fmtMC(d.market_cap_usd) : '\u2014',
   };
 
   return (
