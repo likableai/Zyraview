@@ -18,9 +18,9 @@ export const socialchain = {
     } catch (error) {
       console.error('Error fetching account details:', error);
       return {
-        "total_circulating_supply": 6600980756.30989,
-        "total_locked": 4968482226.44967,
-        "total_supply": 10155355009.7075,
+        "total_circulating_supply": 10600000000,
+        "total_locked": 6170000000,
+        "total_supply": 100000000000,
       }
     }
   },
