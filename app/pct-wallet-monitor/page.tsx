@@ -184,7 +184,7 @@ export default function PctWalletMonitorPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-primary tracking-tight mb-1">
           {tStr('pct.title')}
         </h1>
-        <p className="text-sm text-muted-foreground mb-6">{tStr('pct.subtitle')}</p>
+        {/* <p className="text-sm text-muted-foreground mb-6">{tStr('pct.subtitle')}</p> */}
 
         {summaryErr && <p className="text-destructive text-sm mb-4">{summaryErr}</p>}
 
