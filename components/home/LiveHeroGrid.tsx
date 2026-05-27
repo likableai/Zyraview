@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { DollarSign, Hash, Globe, Box, Lock, Zap, TrendingUp } from 'lucide-react';
+import { Sparkline, generateSparklineData } from '@/components/charts/Sparkline';
+import { useMobileLabel } from '@/hooks/use-mobile-labels';
 
 type HeroData = {
   priceUsd: number;
@@ -12,17 +14,18 @@ type HeroData = {
   latest_block: number;
   tps: number;
   market_cap_usd?: number;
+  priceHistory?: Array<{ time: string; value: number }>;
   updatedAt?: string;
 };
 
 const metricConfig = [
-  { key: 'price', label: 'Pi Price', icon: DollarSign, color: 'text-green-500', bg: 'bg-green-50 dark:bg-green-950/20' },
-  { key: 'block', label: 'Latest Block', icon: Hash, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
-  { key: 'circ', label: 'Circulating', icon: Globe, color: 'text-purple-500', bg: 'bg-purple-50 dark:bg-purple-950/20' },
-  { key: 'supply', label: 'Total Supply', icon: Box, color: 'text-yellow-500', bg: 'bg-yellow-50 dark:bg-yellow-950/20' },
-  { key: 'locked', label: 'Locked Pi', icon: Lock, color: 'text-red-500', bg: 'bg-red-50 dark:bg-red-950/20' },
-  { key: 'tps', label: 'TPS (est.)', icon: Zap, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/20' },
-  { key: 'mcap', label: 'Market Cap', icon: TrendingUp, color: 'text-pink-500', bg: 'bg-pink-50 dark:bg-pink-950/20' },
+  { key: 'price', label: 'Price', icon: DollarSign },
+  { key: 'block', label: 'Block', icon: Hash },
+  { key: 'circ', label: 'Circulating', icon: Globe },
+  { key: 'supply', label: 'Supply', icon: Box },
+  { key: 'locked', label: 'Locked', icon: Lock },
+  { key: 'tps', label: 'TPS', icon: Zap },
+  { key: 'mcap', label: 'Market Cap', icon: TrendingUp },
 ] as const;
 
 const POLL_MS = 5000;
@@ -42,7 +45,10 @@ function fmtB(n: number) {
 }
 
 export function LiveHeroGrid({ initial }: { initial: HeroData }) {
-  const [data, setData] = useState<HeroData>(initial);
+  const [data, setData] = useState<HeroData>({
+    ...initial,
+    priceHistory: initial.priceHistory || generateSparklineData(initial.priceUsd * 0.95, initial.priceUsd * 1.05),
+  });
   const [live, setLive] = useState(false);
   const mounted = useRef(true);
 
@@ -94,34 +100,44 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
 
   return (
     <section>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3">
-        {metricConfig.map((m) => (
-          <Card key={m.key} className="border-border/60 bg-card/40 backdrop-blur hover:shadow-md transition-shadow">
-            <CardContent className="p-3 sm:p-4">
-              <div className="flex items-center justify-between gap-1.5 mb-1.5">
-                <span className="text-[10px] sm:text-xs font-medium text-muted-foreground uppercase tracking-wider truncate">
-                  {m.label}
-                </span>
-                <div className={`rounded-full p-1 ${m.bg}`}>
-                  <m.icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 ${m.color}`} />
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 md:gap-4">
+        {metricConfig.map((m) => {
+          const Icon = m.icon;
+          const abbrevLabel = useMobileLabel(m.label);
+          const sparklineData = m.key === 'price' ? d.priceHistory : generateSparklineData(parseFloat(values[m.key]) * 0.9, parseFloat(values[m.key]) * 1.1);
+          const isPositive = !sparklineData || sparklineData.length < 2 ? true : sparklineData[sparklineData.length - 1].value >= sparklineData[0].value;
+          
+          return (
+            <Card key={m.key} className="card-elevated">
+              <CardContent className="p-2.5 sm:p-3 md:p-4 lg:p-5 space-y-2 sm:space-y-2.5 md:space-y-3">
+                <div className="flex items-center gap-1.5">
+                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent flex-shrink-0" />
+                  <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider truncate">
+                    {abbrevLabel}
+                  </span>
                 </div>
-              </div>
-              <p className="text-sm sm:text-base font-bold text-foreground truncate">{values[m.key]}</p>
-            </CardContent>
-          </Card>
-        ))}
+                <p className="font-mono text-sm sm:text-base md:text-xl lg:text-4xl font-bold text-foreground truncate">{values[m.key]}</p>
+                {sparklineData && sparklineData.length > 0 && (
+                  <div className="flex justify-start -ml-2.5 sm:-ml-3 md:-ml-4 lg:-ml-5">
+                    <Sparkline data={sparklineData} height={20} isPositive={isPositive} />
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
-      <p className="text-[11px] text-muted-foreground text-right mt-1.5">
+      <p className="text-xs text-muted-foreground text-right mt-4">
         {live && (
-          <span className="inline-flex items-center gap-1 mr-2 text-emerald-600 dark:text-emerald-400">
-            <span className="relative flex h-1.5 w-1.5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+          <span className="inline-flex items-center gap-2 mr-3 text-accent font-semibold">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
             </span>
             LIVE
           </span>
         )}
-        {data.updatedAt ? `Updated ${new Date(data.updatedAt).toLocaleString()}` : ''}
+        {data.updatedAt ? `Updated ${new Date(data.updatedAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'medium' })}` : ''}
       </p>
     </section>
   );

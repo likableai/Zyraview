@@ -16,7 +16,13 @@ type HeroPayload = {
 
 export async function HomeMarketSection() {
   const res = await fetchSnapshot<HeroPayload>('hero', 10);
-  if (!res.success || !res.data) return null;
+  if (!res.success || !res.data) {
+    return (
+      <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
+        Market data temporarily unavailable. The API server may be offline.
+      </section>
+    );
+  }
 
   return <LiveMarketOverview initial={{ ...res.data, updatedAt: res.updatedAt }} />;
 }

@@ -11,29 +11,6 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          dark: {
-            DEFAULT: "#0B0D0C",
-            muted: "#0F1211",
-            border: "#1B2421",
-          },
-          neon: {
-            DEFAULT: "#4CD964",
-            dim: "#2EBB56",
-          },
-          stone: {
-            50: "#f5f5f0",
-            100: "#eaeae6",
-            200: "#dededa",
-            300: "#d1d1cb",
-            400: "#bfbfb7",
-            500: "#a6a69d",
-            600: "#8c8c82",
-            700: "#737368",
-            800: "#59594f",
-            900: "#404038",
-          },
-        },
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
@@ -76,16 +53,8 @@ const config: Config = {
         },
       },
       fontFamily: {
-        satoshi: [
-          "Satoshi",
-          "-apple-system",
-          "BlinkMacSystemFont",
-          "Segoe UI",
-          "Roboto",
-          "sans-serif",
-        ],
-        clash: [
-          "Clash Display",
+        sans: [
+          "Inter",
           "-apple-system",
           "BlinkMacSystemFont",
           "Segoe UI",
@@ -104,9 +73,19 @@ const config: Config = {
         ],
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "0.5rem",
+        md: "0.375rem",
+        sm: "0.25rem",
+      },
+      spacing: {
+        18: "4.5rem",
+        22: "5.5rem",
+        28: "7rem",
+      },
+      boxShadow: {
+        sm: "0 2px 8px rgba(0, 0, 0, 0.05)",
+        md: "0 4px 12px rgba(0, 0, 0, 0.08)",
+        lg: "0 12px 24px rgba(0, 0, 0, 0.12)",
       },
       keyframes: {
         "accordion-down": {

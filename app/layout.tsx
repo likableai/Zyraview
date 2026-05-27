@@ -8,6 +8,9 @@ import GlobalMobileElements from "@/components/GlobalMobileElements";
 import { ThemeProvider } from "@/components/theme-provider";
 import NavbarWithMobile from '@/components/navbar';
 import { AddressProvider } from '@/context/AddressContext';
+import { ToastProvider } from '@/components/context/ToastContext';
+import { ToastContainer } from '@/components/ui/toast-container';
+import { BackgroundAnimation } from '@/components/BackgroundAnimation';
 import Script from 'next/script';
 import type { Metadata, Viewport } from "next";
 import MobilePiWelcome from "@/components/MobilePiWelcome";
@@ -39,27 +42,34 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
-      <Script src="https://sdk.minepi.com/pi-sdk.js" strategy="beforeInteractive" />
-      <Script id="pi-init" strategy="beforeInteractive">
+      <Script id="pi-sdk-loader" strategy="afterInteractive">
         {`
-          const Pi = window.Pi;
-          Pi.init({ version: "2.0" });
+          (function() {
+            var s = document.createElement('script');
+            s.src = 'https://sdk.minepi.com/pi-sdk.js';
+            s.onload = function() { window.Pi && window.Pi.init({ version: '2.0' }); };
+            document.head.appendChild(s);
+          })();
         `}
       </Script>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <BackgroundAnimation />
+        <ThemeProvider defaultTheme="system">
           <PiNetworkProvider>
             <AddressProvider>
               <LanguageProvider>
                 <PageMetadataProvider>
-                  <MobilePiWelcome />
-                    <NavbarWithMobile />
-                    <GlobalMobileElements />
-                    <div className="flex min-h-screen flex-col">
-                      <main className="flex-1 pb-safe-area-mobile lg:pb-0">
-                        {children}
-                      </main>
+                  <ToastProvider>
+                    <MobilePiWelcome />
+                      <NavbarWithMobile />
+                      <GlobalMobileElements />
+                      <div className="flex min-h-screen flex-col">
+                        <main className="flex-1 pb-safe-area-mobile lg:pb-0">
+                          {children}
+                        </main>
                       <GlobalFooter />
-                    </div>
+                      </div>
+                    <ToastContainer />
+                  </ToastProvider>
                 </PageMetadataProvider>
               </LanguageProvider>
             </AddressProvider>

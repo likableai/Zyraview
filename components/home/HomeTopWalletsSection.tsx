@@ -17,24 +17,30 @@ type TopWalletsPayload = {
 };
 
 const categoryColors: Record<string, string> = {
-  CEX: 'bg-amber-100 text-amber-800 dark:bg-amber-900/20 dark:text-amber-400',
-  'Core Team': 'bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400',
-  Generated: 'bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400',
+  CEX: 'bg-muted text-foreground',
+  'Core Team': 'bg-secondary text-foreground',
+  Generated: 'bg-accent text-foreground',
 };
 
 export async function HomeTopWalletsSection() {
   const res = await fetchSnapshot<TopWalletsPayload>('top-wallets', 300);
-  if (!res.success || !res.data) return null;
+  if (!res.success || !res.data) {
+    return (
+      <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
+        Wallet data temporarily unavailable. The API server may be offline.
+      </section>
+    );
+  }
 
   const wallets = res.data.wallets.slice(0, 25);
   const totalBalance = wallets.reduce((s, w) => s + (w.balance || 0), 0);
 
   return (
     <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
-      <Card className="lg:col-span-2 border-border/60 bg-card/40">
+      <Card className="lg:col-span-2 border border-border bg-card">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5 flex-row items-center justify-between">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Wallet className="h-4 w-4 text-emerald-500" />
+            <Wallet className="h-4 w-4" />
             Top Tracked Wallets
           </CardTitle>
           <Link href="/pct-wallet-monitor" className="text-xs text-primary hover:underline shrink-0">
@@ -89,9 +95,9 @@ export async function HomeTopWalletsSection() {
       {/* Real-time transaction feed */}
       <div className="lg:col-span-1">
         <Suspense fallback={
-          <Card className="border-border/60 bg-card/40">
+          <Card className="border border-border bg-card">
             <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
-              <CardTitle className="text-sm font-semibold">Live Transactions</CardTitle>
+              <CardTitle className="text-sm font-semibold">Transactions</CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4 sm:px-5 sm:pb-5">
               <div className="animate-pulse space-y-2">

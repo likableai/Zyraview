@@ -266,7 +266,7 @@ export class ApiClient {
     return this.request(`/api/cex-monitor/aggregate-balance-history?range=${range}`);
   }
 
-  /** Aggregate balance history for PCT wallets */
+  /** Aggregate balance history for core team wallets */
   async getPctAggregateBalanceHistory(range: '1d' | '7d' | '30d' = '7d'): Promise<ApiResponse> {
     return this.request(`/api/pct-monitor/aggregate-balance-history?range=${range}`);
   }

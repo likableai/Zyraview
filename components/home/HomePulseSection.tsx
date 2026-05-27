@@ -18,7 +18,7 @@ export async function HomePulseSection() {
   if (!res.success || !res.data) {
     return (
       <section className="rounded-xl border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
-        Pulse metrics require PCT balance events in the database. They will appear once the scanner has data.
+        Pulse metrics show up once we have balance data.
       </section>
     );
   }

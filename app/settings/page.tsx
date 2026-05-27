@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { useLanguage, languageNames } from '@/context/languagecontext';
-import { useTheme } from 'next-themes';
+import { useTheme } from '@/components/theme-provider';
 
 const SettingsPage: React.FC = () => {
   const { language, setLanguage } = useLanguage();

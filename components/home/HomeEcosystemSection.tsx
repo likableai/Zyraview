@@ -10,7 +10,13 @@ type EcoPayload = {
 
 export async function HomeEcosystemSection() {
   const res = await fetchSnapshot<EcoPayload>('ecosystem-leaderboards', 600);
-  if (!res.success || !res.data) return null;
+  if (!res.success || !res.data) {
+    return (
+      <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
+        Ecosystem data temporarily unavailable. The API server may be offline.
+      </section>
+    );
+  }
 
   const communities = (res.data.communities || []) as Array<{
     Name?: string;
@@ -29,10 +35,10 @@ export async function HomeEcosystemSection() {
   return (
     <section className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
       {/* Stats summary */}
-      <Card className="lg:col-span-1 border-border/60 bg-card/40">
+      <Card className="lg:col-span-1 border border-border bg-card">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Globe className="h-4 w-4 text-emerald-500" />
+            <Globe className="h-4 w-4" />
             Ecosystem Overview
           </CardTitle>
         </CardHeader>
@@ -64,10 +70,10 @@ export async function HomeEcosystemSection() {
       </Card>
 
       {/* Top Communities */}
-      <Card className="lg:col-span-2 border-border/60 bg-card/40">
+      <Card className="lg:col-span-2 border border-border bg-card">
         <CardHeader className="pb-2 px-4 pt-4 sm:px-5 sm:pt-5">
           <CardTitle className="text-sm font-semibold flex items-center gap-2">
-            <Users className="h-4 w-4 text-emerald-500" />
+            <Users className="h-4 w-4" />
             Largest Communities
           </CardTitle>
         </CardHeader>
@@ -81,7 +87,7 @@ export async function HomeEcosystemSection() {
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="text-xs font-mono text-muted-foreground w-5 shrink-0 text-right">#{i + 1}</span>
                     <span className="text-sm font-medium truncate">{c.Name}</span>
-                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 shrink-0">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-foreground shrink-0">
                       {c.Category || 'General'}
                     </span>
                   </div>

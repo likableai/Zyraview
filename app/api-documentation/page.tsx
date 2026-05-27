@@ -86,7 +86,7 @@ const SERVICES: Record<TabId, { label: string; icon: React.ElementType; desc: st
       { method: 'GET', path: '/api/admin/listings', auth: 'admin', description: 'Review pending/approved/rejected listings.' },
       { method: 'PUT', path: '/api/admin/listings/:type/:id/approve', auth: 'admin', description: 'Approve a listing.' },
       { method: 'PUT', path: '/api/admin/listings/:type/:id/reject', auth: 'admin', description: 'Reject a listing.' },
-      { method: 'POST', path: '/api/admin/addresses/core-team', auth: 'admin', description: 'Add a Core Team wallet address for PCT monitoring.' },
+      { method: 'POST', path: '/api/admin/addresses/core-team', auth: 'admin', description: 'Add a core team wallet for tracking.' },
       { method: 'POST', path: '/api/admin/addresses/cex', auth: 'admin', description: 'Add a CEX wallet address for exchange flow monitoring.' },
       { method: 'GET', path: '/api/admin/analytics', auth: 'admin', description: 'Platform analytics and metrics.' },
     ]
@@ -101,7 +101,7 @@ const SERVICES: Record<TabId, { label: string; icon: React.ElementType; desc: st
       { method: 'GET', path: '/api/ecosystem?type=hackathons', auth: 'public', description: 'List hackathons.' },
       { method: 'GET', path: '/api/ecosystem?type=influencers', auth: 'public', description: 'List influencers.' },
       { method: 'GET', path: '/api/ecosystem?type=cex-addresses', auth: 'public', description: 'Known CEX wallet addresses.' },
-      { method: 'GET', path: '/api/ecosystem?type=core-team-addresses', auth: 'public', description: 'Known PCT wallet addresses.' },
+      { method: 'GET', path: '/api/ecosystem?type=core-team-addresses', auth: 'public', description: 'Known core team wallet addresses.' },
       { method: 'GET', path: '/api/ecosystem?type=generated-addresses', auth: 'public', description: 'Generated wallet addresses.' },
       { method: 'GET', path: '/api/events', auth: 'public', description: 'Standalone events CRUD. Query: ?page=1&limit=20' },
       { method: 'GET', path: '/api/hackathons', auth: 'public', description: 'Standalone hackathons CRUD. Query: ?page=1&limit=20' },
@@ -111,13 +111,13 @@ const SERVICES: Record<TabId, { label: string; icon: React.ElementType; desc: st
   monitor: {
     label: 'Wallet Monitors',
     icon: Wallet,
-    desc: 'Pi Core Team (PCT) and CEX wallet balance monitoring, movement tracking, and historical data.',
+    desc: 'Core team and exchange wallet tracking with history.',
     endpoints: [
-      { method: 'GET', path: '/api/pct-monitor/summary', auth: 'public', description: 'PCT wallet aggregate summary (total balance, inflow, outflow, wallet count).' },
-      { method: 'GET', path: '/api/pct-monitor/movements', auth: 'public', description: 'Recent PCT wallet movements/transactions. Query: ?page=1&limit=20' },
+      { method: 'GET', path: '/api/pct-monitor/summary', auth: 'public', description: 'Core team wallet summary: balances and flow.' },
+      { method: 'GET', path: '/api/pct-monitor/movements', auth: 'public', description: 'Recent core team wallet moves. Query: ?page=1&limit=20' },
       { method: 'GET', path: '/api/pct-monitor/changes', auth: 'public', description: 'Balance change events over time.' },
-      { method: 'GET', path: '/api/pct-monitor/wallets', auth: 'public', description: 'PCT wallet directory with individual balances.' },
-      { method: 'GET', path: '/api/pct-monitor/wallets/:address/history', auth: 'public', description: 'Balance history for a specific PCT wallet.' },
+      { method: 'GET', path: '/api/pct-monitor/wallets', auth: 'public', description: 'Core team wallet list with balances.' },
+      { method: 'GET', path: '/api/pct-monitor/wallets/:address/history', auth: 'public', description: 'Balance history for one core team wallet.' },
       { method: 'GET', path: '/api/cex-monitor/summary', auth: 'public', description: 'CEX wallet aggregate summary.' },
       { method: 'GET', path: '/api/cex-monitor/movements', auth: 'public', description: 'Recent CEX wallet movements.' },
       { method: 'GET', path: '/api/cex-monitor/changes', auth: 'public', description: 'CEX balance change events.' },
@@ -643,7 +643,7 @@ curl "${apiBase}/api/pct-monitor/summary"`}</code>
                 <tr>
                   <td className="py-2 font-medium text-foreground">All Public Endpoints</td>
                   <td className="py-2 text-green-600 font-medium">Free</td>
-                  <td className="py-2">Listings read, ecosystem, PCT/CEX monitors, v2 home, charts, social stats</td>
+                  <td className="py-2">Listings read, ecosystem, core/exchange monitors, v2 home, charts, social stats</td>
                 </tr>
               </tbody>
             </table>
