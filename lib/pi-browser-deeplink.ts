@@ -23,34 +23,38 @@ export function openInPiBrowser(targetUrl?: string): { attempted: boolean; platf
   const url = targetUrl || getCurrentUrl();
   const encodedUrl = encodeURIComponent(url);
 
-  if (platform === 'ios') {
-    const schemes = ['minepi://', 'pi://'];
-    for (const scheme of schemes) {
+  if (platform === 'ios' || platform === 'android') {
+    // Try common Pi Browser custom URL schemes
+    const schemeUrls = [
+      `minepi://open?url=${encodedUrl}`,
+      `pi://open?url=${encodedUrl}`,
+      `pi-browser://open?url=${encodedUrl}`,
+      `minepi://`,
+      `pi://`,
+    ];
+
+    let tried = false;
+    for (const schemeUrl of schemeUrls) {
+      if (tried) break;
       try {
-        window.location.href = scheme;
-        break;
+        window.location.href = schemeUrl;
+        tried = true;
       } catch {
         continue;
       }
     }
-    // Fallback on iOS after delay
+
+    // Fallback: if Pi Browser didn't open, navigate in current browser
     setTimeout(() => {
-      if (document.hidden === false) {
-        window.location.href = 'https://minepi.com';
+      if (!document.hidden) {
+        window.location.href = url;
       }
-    }, 2500);
-    return { attempted: true, platform: 'ios' };
+    }, 1500);
+
+    return { attempted: true, platform };
   }
 
-  if (platform === 'android') {
-    // Android Intent URL with fallback - most reliable for Android
-    const intentUrl =
-      `intent://open#Intent;scheme=minepi;package=com.blockchainvault;S.browser_fallback_url=${encodedUrl};end`;
-    window.location.href = intentUrl;
-    return { attempted: true, platform: 'android' };
-  }
-
-  // Desktop: no Pi Browser exists, navigate normally in current browser
+  // Desktop: just open in current browser
   window.location.href = url;
   return { attempted: true, platform: 'desktop' };
 }
@@ -65,7 +69,6 @@ export function useSmartDeepLink(): {
 
   const openLink = (targetUrl?: string) => {
     if (piAvailable) {
-      // Already inside Pi Browser, just navigate normally
       if (targetUrl) {
         window.location.href = targetUrl;
       }
@@ -75,37 +78,31 @@ export function useSmartDeepLink(): {
     const url = targetUrl || getCurrentUrl();
     const encodedUrl = encodeURIComponent(url);
 
-    if (platform === 'ios') {
-      const schemes = ['minepi://', 'pi://'];
-      let opened = false;
+    if (platform === 'ios' || platform === 'android') {
+      const schemeUrls = [
+        `minepi://open?url=${encodedUrl}`,
+        `pi://open?url=${encodedUrl}`,
+        `pi-browser://open?url=${encodedUrl}`,
+        `minepi://`,
+        `pi://`,
+      ];
 
-      for (const scheme of schemes) {
+      let tried = false;
+      for (const schemeUrl of schemeUrls) {
+        if (tried) break;
         try {
-          window.location.href = scheme;
-          opened = true;
-          break;
+          window.location.href = schemeUrl;
+          tried = true;
         } catch {
           continue;
         }
       }
 
-      const fallbackTimer = setTimeout(() => {
-        if (opened && document.hidden === false && document.visibilityState === 'visible') {
-          window.open('https://minepi.com', '_blank');
+      setTimeout(() => {
+        if (!document.hidden) {
+          window.location.href = url;
         }
-      }, 2500);
-
-      if (opened) {
-        window.addEventListener(
-          'pagehide',
-          () => clearTimeout(fallbackTimer),
-          { once: true }
-        );
-      }
-    } else if (platform === 'android') {
-      const intentUrl =
-        `intent://open#Intent;scheme=minepi;package=com.blockchainvault;S.browser_fallback_url=${encodedUrl};end`;
-      window.location.href = intentUrl;
+      }, 1500);
     } else {
       window.location.href = url;
     }
