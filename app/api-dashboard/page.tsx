@@ -14,11 +14,9 @@ import {
   Loader2, Copy, Check, AlertCircle, RefreshCw, Eye, Zap,
   Shield, TrendingUp, Timer, Hash
 } from 'lucide-react';
+import { getPublicBackendUrl } from '@/lib/get-backend-url';
 
-const SERVER_BASE =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://Zyrachain-server.onrender.com';
+const SERVER_BASE = getPublicBackendUrl();
 
 interface ApiKeyDoc {
   _id: string;

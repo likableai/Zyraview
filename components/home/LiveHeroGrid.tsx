@@ -1,10 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign, Hash, Globe, Box, Lock, Zap, TrendingUp } from 'lucide-react';
-import { Sparkline, generateSparklineData } from '@/components/charts/Sparkline';
+import type { LucideIcon } from 'lucide-react';
+import { DollarSign, Hash, Globe, Box, Lock, Zap, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { Sparkline, type SparklineDataPoint } from '@/components/charts/Sparkline';
 import { useMobileLabel } from '@/hooks/use-mobile-labels';
+import { usePriceHistory } from '@/lib/use-chart-data';
+import { fmtUsd, fmtMoneyCompact, fmtCompact, fmtInt, formatChange } from '@/lib/format';
 
 type HeroData = {
   priceUsd: number;
@@ -14,43 +17,89 @@ type HeroData = {
   latest_block: number;
   tps: number;
   market_cap_usd?: number;
-  priceHistory?: Array<{ time: string; value: number }>;
+  priceChange24h?: number;
+  marketCapChange24h?: number;
   updatedAt?: string;
 };
 
-const metricConfig = [
+interface MetricConfig {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+}
+
+const metricConfig: MetricConfig[] = [
   { key: 'price', label: 'Price', icon: DollarSign },
+  { key: 'mcap', label: 'Market Cap', icon: TrendingUp },
   { key: 'block', label: 'Block', icon: Hash },
   { key: 'circ', label: 'Circulating', icon: Globe },
   { key: 'supply', label: 'Supply', icon: Box },
   { key: 'locked', label: 'Locked', icon: Lock },
   { key: 'tps', label: 'TPS', icon: Zap },
-  { key: 'mcap', label: 'Market Cap', icon: TrendingUp },
-] as const;
+];
 
 const POLL_MS = 5000;
 
-function fmtUsd(n: number) {
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 4 }).format(n);
-}
+function MetricCard({
+  cfg,
+  value,
+  fullValue,
+  showChange,
+  changePct,
+  sparklineData,
+}: {
+  cfg: MetricConfig;
+  value: string;
+  fullValue: string;
+  showChange: boolean;
+  changePct?: number;
+  sparklineData?: SparklineDataPoint[] | null;
+}) {
+  const Icon = cfg.icon;
+  const abbrevLabel = useMobileLabel(cfg.label);
+  const change = showChange ? formatChange(changePct) : null;
 
-function fmtMC(n: number) {
-  if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`;
-  if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`;
-  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(n);
-}
+  const priceUp = sparklineData && sparklineData.length >= 2
+    ? sparklineData[sparklineData.length - 1].value >= sparklineData[0].value
+    : true;
 
-function fmtB(n: number) {
-  return `${(n / 1e9).toFixed(2)}B`;
+  return (
+    <Card className="card-elevated min-w-0 overflow-hidden">
+      <CardContent className="p-2.5 sm:p-3 md:p-4 lg:p-5 space-y-1.5 sm:space-y-2">
+        <div className="flex items-center gap-1.5">
+          <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent flex-shrink-0" />
+          <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider truncate">
+            {abbrevLabel}
+          </span>
+        </div>
+        <p
+          title={fullValue}
+          className="font-mono font-bold text-foreground leading-tight tabular-nums w-full max-w-full overflow-hidden text-ellipsis whitespace-nowrap text-base sm:text-lg md:text-xl lg:text-[clamp(0.95rem,1.4vw,1.5rem)]"
+        >
+          {value}
+        </p>
+        {change && !change.isFlat ? (
+          <span className={`inline-flex items-center text-[10px] sm:text-xs font-bold ${change.color}`}>
+            {change.isGain ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+            {change.text}
+          </span>
+        ) : sparklineData && sparklineData.length > 0 ? (
+          <div className="flex justify-start -ml-1">
+            <Sparkline data={sparklineData} height={20} isPositive={priceUp} />
+          </div>
+        ) : (
+          <span className="block h-[16px]" />
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export function LiveHeroGrid({ initial }: { initial: HeroData }) {
-  const [data, setData] = useState<HeroData>({
-    ...initial,
-    priceHistory: initial.priceHistory || generateSparklineData(initial.priceUsd * 0.95, initial.priceUsd * 1.05),
-  });
+  const [data, setData] = useState<HeroData>(initial);
   const [live, setLive] = useState(false);
   const mounted = useRef(true);
+  const { priceHistory } = usePriceHistory('1d');
 
   useEffect(() => {
     mounted.current = true;
@@ -61,16 +110,7 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
         const res = await fetch('/api/v2/home/hero?fresh=1', { cache: 'no-store' });
         const json = await res.json();
         if (json.success && json.data && mounted.current) {
-          setData({
-            priceUsd: json.data.priceUsd ?? 0,
-            total_circulating_supply: json.data.total_circulating_supply ?? 0,
-            total_supply: json.data.total_supply ?? 0,
-            total_locked: json.data.total_locked ?? 0,
-            latest_block: json.data.latest_block ?? 0,
-            tps: json.data.tps ?? 0,
-            market_cap_usd: json.data.market_cap_usd,
-            updatedAt: json.updatedAt,
-          });
+          setData((d) => ({ ...d, ...json.data, updatedAt: json.updatedAt }));
           setLive(true);
         }
       } catch {
@@ -87,45 +127,45 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
     };
   }, []);
 
-  const d = data;
-  const values: Record<string, string> = {
-    price: fmtUsd(d.priceUsd),
-    block: String(d.latest_block ?? '\u2014'),
-    circ: fmtB(d.total_circulating_supply),
-    supply: fmtB(d.total_supply),
-    locked: fmtB(d.total_locked),
-    tps: typeof d.tps === 'number' ? d.tps.toFixed(2) : '\u2014',
-    mcap: d.market_cap_usd ? fmtMC(d.market_cap_usd) : '\u2014',
-  };
+  const priceSparkline: SparklineDataPoint[] = useMemo(
+    () => priceHistory.map((p) => ({ time: p.time, value: p.close })),
+    [priceHistory],
+  );
+
+  const values: Record<string, string> = useMemo(() => ({
+    price: fmtUsd(data.priceUsd),
+    mcap: data.market_cap_usd ? fmtMoneyCompact(data.market_cap_usd) : '\u2014',
+    block: data.latest_block ? fmtInt(data.latest_block) : '\u2014',
+    circ: fmtCompact(data.total_circulating_supply),
+    supply: fmtCompact(data.total_supply),
+    locked: fmtCompact(data.total_locked),
+    tps: typeof data.tps === 'number' ? data.tps.toFixed(2) : '\u2014',
+  }), [data]);
+
+  const fullValues: Record<string, string> = useMemo(() => ({
+    price: fmtUsd(data.priceUsd),
+    mcap: data.market_cap_usd ? `$${fmtInt(data.market_cap_usd)}` : '\u2014',
+    block: data.latest_block ? fmtInt(data.latest_block) : '\u2014',
+    circ: `${fmtInt(data.total_circulating_supply)} Pi`,
+    supply: `${fmtInt(data.total_supply)} Pi`,
+    locked: `${fmtInt(data.total_locked)} Pi`,
+    tps: typeof data.tps === 'number' ? data.tps.toFixed(2) : '\u2014',
+  }), [data]);
 
   return (
     <section>
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2 sm:gap-3 md:gap-4">
-        {metricConfig.map((m) => {
-          const Icon = m.icon;
-          const abbrevLabel = useMobileLabel(m.label);
-          const sparklineData = m.key === 'price' ? d.priceHistory : generateSparklineData(parseFloat(values[m.key]) * 0.9, parseFloat(values[m.key]) * 1.1);
-          const isPositive = !sparklineData || sparklineData.length < 2 ? true : sparklineData[sparklineData.length - 1].value >= sparklineData[0].value;
-          
-          return (
-            <Card key={m.key} className="card-elevated">
-              <CardContent className="p-2.5 sm:p-3 md:p-4 lg:p-5 space-y-2 sm:space-y-2.5 md:space-y-3">
-                <div className="flex items-center gap-1.5">
-                  <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-accent flex-shrink-0" />
-                  <span className="text-[9px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider truncate">
-                    {abbrevLabel}
-                  </span>
-                </div>
-                <p className="font-mono text-sm sm:text-base md:text-xl lg:text-4xl font-bold text-foreground truncate">{values[m.key]}</p>
-                {sparklineData && sparklineData.length > 0 && (
-                  <div className="flex justify-start -ml-2.5 sm:-ml-3 md:-ml-4 lg:-ml-5">
-                    <Sparkline data={sparklineData} height={20} isPositive={isPositive} />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          );
-        })}
+        {metricConfig.map((cfg) => (
+          <MetricCard
+            key={cfg.key}
+            cfg={cfg}
+            value={values[cfg.key]}
+            fullValue={fullValues[cfg.key]}
+            showChange={cfg.key === 'price' || cfg.key === 'mcap'}
+            changePct={cfg.key === 'price' ? data.priceChange24h : cfg.key === 'mcap' ? data.marketCapChange24h : undefined}
+            sparklineData={cfg.key === 'price' ? priceSparkline : null}
+          />
+        ))}
       </div>
       <p className="text-xs text-muted-foreground text-right mt-4">
         {live && (

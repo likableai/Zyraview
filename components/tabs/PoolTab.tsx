@@ -65,8 +65,9 @@ export default function PoolTab({ onLoad }: PoolTabProps) {
         const r = await fetch('/api/v2/home/assets-pools');
         const j = await r.json();
         const pools = j?.data?.pools;
-        if (j?.success && pools?._embedded?.records) {
-          const records = (pools as PoolsApiResponse)._embedded?.records || [];
+        // Only use snapshot if it has actual data (mainnet returns empty arrays)
+        const records = (pools as PoolsApiResponse | undefined)?._embedded?.records || [];
+        if (j?.success && records.length > 0) {
           setPools(records);
           onLoad?.(records);
           setLoading(false);

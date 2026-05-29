@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
+import { getBackendUrl } from '@/lib/get-backend-url';
 
 // Validation schema for update requests
 const updateListingSchema = z.object({
@@ -48,7 +49,7 @@ const searchSchema = z.object({
   message: "Either project name or email must be provided"
 });
 
-const SERVER_URL = process.env.SERVER_URL || 'http://localhost:4000';
+const SERVER_URL = getBackendUrl();
 
 export async function GET(request: NextRequest) {
   try {

@@ -337,4 +337,65 @@
   .dark .text-muted-foreground {
     @apply text-slate-400;
   }
+
+  /* ---- Live data-center animations ---- */
+
+  /* Value-change flash (CoinMarketCap-style tick highlight) */
+  @keyframes flash-up {
+    0% { background-color: hsl(var(--success) / 0.28); }
+    100% { background-color: transparent; }
+  }
+
+  @keyframes flash-down {
+    0% { background-color: hsl(var(--danger) / 0.28); }
+    100% { background-color: transparent; }
+  }
+
+  .flash-up {
+    animation: flash-up 0.9s ease-out;
+    border-radius: 0.25rem;
+  }
+
+  .flash-down {
+    animation: flash-down 0.9s ease-out;
+    border-radius: 0.25rem;
+  }
+
+  /* New row entrance flash for live feeds */
+  @keyframes row-enter {
+    0% { background-color: hsl(var(--accent) / 0.18); opacity: 0.4; }
+    100% { background-color: transparent; opacity: 1; }
+  }
+
+  .row-enter {
+    animation: row-enter 1.1s ease-out;
+  }
+
+  /* Continuous marquee for the live ticker strip */
+  @keyframes ticker-scroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .ticker-track {
+    display: inline-flex;
+    flex-shrink: 0;
+    animation: ticker-scroll 40s linear infinite;
+    will-change: transform;
+  }
+
+  .ticker-viewport:hover .ticker-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-track {
+      animation: none;
+    }
+    .flash-up,
+    .flash-down,
+    .row-enter {
+      animation: none;
+    }
+  }
 }

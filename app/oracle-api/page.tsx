@@ -11,11 +11,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, KeyRound, Copy, Check } from 'lucide-react';
+import { getPublicBackendUrl } from '@/lib/get-backend-url';
 
-const BASE =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://Zyrachain-server.onrender.com';
+const BASE = getPublicBackendUrl();
 
 export default function OracleApiPage() {
   const { setTitle, setDescription, setHeading } = usePageMetadata();

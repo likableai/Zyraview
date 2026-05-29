@@ -62,7 +62,9 @@ export default function AssetsTab({ onLoad }: AssetsTabProps) {
           const r = await fetch('/api/v2/home/assets-pools');
           const j = await r.json();
           const assets = j?.data?.assets;
-          if (j?.success && assets?._embedded?.records) {
+          // Only use snapshot if it has actual data (mainnet returns empty arrays = no assets)
+          const records = assets?._embedded?.records as Asset[] | undefined;
+          if (j?.success && records && records.length > 0) {
             const data = assets as AssetsApiResponse;
             setAssetsData(data);
             onLoad?.(data);
@@ -70,7 +72,7 @@ export default function AssetsTab({ onLoad }: AssetsTabProps) {
             return;
           }
         } catch {
-          /* fallback to direct horizon */
+          /* fallback to direct testnet horizon */
         }
       }
 

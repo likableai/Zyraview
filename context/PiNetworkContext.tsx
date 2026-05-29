@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { piListingPaymentService } from '../lib/pi-payment-frontend';
 import { ListingType } from '../lib/pi-network';
+import { getPublicBackendUrl } from '@/lib/get-backend-url';
 
 interface PiUser {
   uid: string;
@@ -73,10 +74,7 @@ interface PiNetworkProviderProps {
 }
 
 // Express server base URL
-const SERVER_BASE_URL =
-  process.env.NEXT_PUBLIC_SERVER_URL ||
-  process.env.NEXT_PUBLIC_API_URL ||
-  'https://Zyrachain-server.onrender.com';
+const SERVER_BASE_URL = getPublicBackendUrl();
 
 export function PiNetworkProvider({ children }: PiNetworkProviderProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { headers } from 'next/headers';
+import { getBackendUrl } from '@/lib/get-backend-url';
 
-const SERVER_URL = process.env.SERVER_URL || 'http://localhost:4000';
+const SERVER_URL = getBackendUrl();
 
 export async function GET(_request: NextRequest) {
   try {
-    const response = await fetch(`${process.env.SERVER_URL}/api/pi/user`);
+    const response = await fetch(`${SERVER_URL}/api/pi/user`);
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
     const body = await req.text();
     const _piUserData = body; // Prefix with underscore since it's unused
 
-    const response = await fetch(`${process.env.SERVER_URL}/api/pi/user`, {
+    const response = await fetch(`${SERVER_URL}/api/pi/user`, {
       method: 'POST',
       headers: {
         'Content-Type': req.headers.get('content-type') || 'application/json',

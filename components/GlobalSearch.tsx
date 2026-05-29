@@ -129,8 +129,8 @@ export function GlobalSearch() {
 
       {/* Search Dialog */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm">
-          <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full max-w-lg">
+        <div className="fixed inset-0 z-[80] bg-black/50 backdrop-blur-sm flex items-start justify-center px-3 sm:px-0 pt-[var(--search-offset,6rem)]">
+          <div className="w-full max-w-lg">
             <div className="bg-card border border-border rounded-lg shadow-2xl overflow-hidden">
               {/* Search Input */}
               <div className="flex items-center border-b border-border px-4 py-3">

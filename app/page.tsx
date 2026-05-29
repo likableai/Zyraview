@@ -1,8 +1,7 @@
 export const dynamic = 'force-dynamic';
 
-import { fetchSnapshot, type SnapshotResponse } from '@/lib/server-fetch';
+import { fetchSnapshot } from '@/lib/server-fetch';
 import { HomePage } from '@/components/home/HomePage';
-import { HomeRealtimeTransactions } from '@/components/home/HomeRealtimeTransactions';
 import { HomeEcosystemSection } from '@/components/home/HomeEcosystemSection';
 
 type HeroData = {
@@ -18,6 +17,7 @@ type HeroData = {
   low24hUsd?: number;
   priceChange24h?: number;
   marketCapChange24h?: number;
+  confidenceScore?: number;
   updatedAt?: string;
 };
 
@@ -54,13 +54,68 @@ type EcoData = {
   influencers: Record<string, unknown>[];
 };
 
+type AssetRecord = Record<string, unknown>;
+type PoolRecord = Record<string, unknown>;
+
+type TradeRecord = {
+  base_amount?: string;
+  counter_amount?: string;
+  base_asset_type?: string;
+  counter_asset_type?: string;
+  base_asset_code?: string;
+  counter_asset_code?: string;
+};
+
+const TESTNET_HORIZON = 'https://api.testnet.minepi.com';
+
+async function fetchTestnetAssetsPools(): Promise<{ assets: AssetRecord[]; pools: PoolRecord[] }> {
+  try {
+    const [assetsRes, poolsRes] = await Promise.all([
+      fetch(`${TESTNET_HORIZON}/assets?limit=100&order=desc`),
+      fetch(`${TESTNET_HORIZON}/liquidity_pools?limit=20&order=desc`),
+    ]);
+    const [assetsJson, poolsJson] = await Promise.all([assetsRes.json(), poolsRes.json()]);
+    return {
+      assets: (assetsJson._embedded?.records ?? []) as AssetRecord[],
+      pools: (poolsJson._embedded?.records ?? []) as PoolRecord[],
+    };
+  } catch {
+    return { assets: [], pools: [] };
+  }
+}
+
+function computeVolume(records: TradeRecord[], priceUsd: number): { volumeUsd: number; pairs: number } {
+  let piVolume = 0;
+  const pairSet = new Set<string>();
+  for (const t of records) {
+    const baseNative = t.base_asset_type === 'native';
+    const counterNative = t.counter_asset_type === 'native';
+    if (baseNative) piVolume += parseFloat(t.base_amount || '0') || 0;
+    else if (counterNative) piVolume += parseFloat(t.counter_amount || '0') || 0;
+    const baseLabel = baseNative ? 'Pi' : t.base_asset_code || t.base_asset_type || '?';
+    const counterLabel = counterNative ? 'Pi' : t.counter_asset_code || t.counter_asset_type || '?';
+    pairSet.add(`${baseLabel}/${counterLabel}`);
+  }
+  return { volumeUsd: piVolume * (priceUsd || 0), pairs: pairSet.size };
+}
+
 export default async function Page() {
-  const [heroRes, pulseRes, walletsRes, ecoRes] = await Promise.all([
+  const [heroRes, pulseRes, walletsRes, ecoRes, testnetData, tradesRes] = await Promise.all([
     fetchSnapshot<HeroData>('hero', 10),
     fetchSnapshot<PulseData>('pulse', 120),
     fetchSnapshot<TopWalletsData>('top-wallets', 300),
     fetchSnapshot<EcoData>('ecosystem-leaderboards', 600),
+    fetchTestnetAssetsPools(),
+    fetchSnapshot<{ records: TradeRecord[] }>('latest-trades', 20),
   ]);
+
+  let tickerVolumeUsd: number | null = null;
+  let tickerPairs: number | null = null;
+  if (tradesRes.success && tradesRes.data?.records && heroRes.success && heroRes.data) {
+    const { volumeUsd, pairs } = computeVolume(tradesRes.data.records, heroRes.data.priceUsd);
+    tickerVolumeUsd = volumeUsd;
+    tickerPairs = pairs;
+  }
 
   return (
     <HomePage
@@ -68,8 +123,11 @@ export default async function Page() {
       pulse={pulseRes}
       wallets={walletsRes}
       eco={ecoRes}
-      realtimeTransactions={<HomeRealtimeTransactions />}
       ecosystemFallback={<HomeEcosystemSection />}
+      assets={testnetData.assets}
+      pools={testnetData.pools}
+      tickerVolumeUsd={tickerVolumeUsd}
+      tickerPairs={tickerPairs}
     />
   );
 }

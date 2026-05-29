@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
+import { getBackendUrl } from '@/lib/get-backend-url';
 
-const SERVER_URL = process.env.SERVER_URL || 'https://Zyrachain-server.onrender.com';
+const SERVER_URL = getBackendUrl();
 
 export async function GET() {
   try {

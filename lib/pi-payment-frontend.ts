@@ -2,6 +2,7 @@
 import { PiSDK, PiPayment, PiPaymentRequest, PiPaymentCallbacks } from '../types/pi sdk';
 
 import { ListingType, LISTING_PAYMENTS } from './pi-network';
+import { getPublicBackendUrl } from './get-backend-url';
 
 export interface PiListingPaymentData {
   listingType: ListingType;
@@ -24,7 +25,7 @@ export interface PiPaymentResult {
 }
 
 // Express server base URL - aligned with backend structure
-const SERVER_BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL || process.env.NEXT_PUBLIC_API_URL || 'localhost:4000';
+const SERVER_BASE_URL = getPublicBackendUrl();
 
 export class PiListingPaymentService {
   private static instance: PiListingPaymentService;
