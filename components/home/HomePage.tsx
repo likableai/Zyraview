@@ -114,13 +114,10 @@ export function HomePage({
   return (
     <>
       {/* Live ticker strip */}
-      {heroData && (
-        <LiveTicker
-          initialHero={heroData}
-          initialVolumeUsd={tickerVolumeUsd}
-          initialPairs={tickerPairs}
-        />
-      )}
+      <LiveTicker
+        initialVolumeUsd={tickerVolumeUsd}
+        initialPairs={tickerPairs}
+      />
 
       <main className="w-full px-3 sm:px-6 lg:px-8 py-5 sm:py-8 lg:py-10 max-w-7xl mx-auto">
         <div className="border-b border-border mb-6 sm:mb-8 flex gap-0 -mx-3 sm:mx-0 px-3 sm:px-0 overflow-x-auto">

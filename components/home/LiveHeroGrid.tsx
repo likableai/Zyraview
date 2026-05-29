@@ -1,12 +1,13 @@
 'use client';
 
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useRef, useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import type { LucideIcon } from 'lucide-react';
 import { DollarSign, Hash, Globe, Box, Lock, Zap, TrendingUp, ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { Sparkline, type SparklineDataPoint } from '@/components/charts/Sparkline';
 import { useMobileLabel } from '@/hooks/use-mobile-labels';
 import { usePriceHistory } from '@/lib/use-chart-data';
+import { useSharedHero } from '@/lib/use-shared-hero';
 import { fmtUsd, fmtMoneyCompact, fmtCompact, fmtInt, formatChange } from '@/lib/format';
 
 type HeroData = {
@@ -38,15 +39,8 @@ const metricConfig: MetricConfig[] = [
   { key: 'tps', label: 'TPS', icon: Zap },
 ];
 
-const POLL_MS = 5000;
-
 function MetricCard({
-  cfg,
-  value,
-  fullValue,
-  showChange,
-  changePct,
-  sparklineData,
+  cfg, value, fullValue, showChange, changePct, sparklineData,
 }: {
   cfg: MetricConfig;
   value: string;
@@ -58,7 +52,6 @@ function MetricCard({
   const Icon = cfg.icon;
   const abbrevLabel = useMobileLabel(cfg.label);
   const change = showChange ? formatChange(changePct) : null;
-
   const priceUp = sparklineData && sparklineData.length >= 2
     ? sparklineData[sparklineData.length - 1].value >= sparklineData[0].value
     : true;
@@ -96,36 +89,9 @@ function MetricCard({
 }
 
 export function LiveHeroGrid({ initial }: { initial: HeroData }) {
-  const [data, setData] = useState<HeroData>(initial);
-  const [live, setLive] = useState(false);
-  const mounted = useRef(true);
+  const { data: liveStore, live, updatedAt } = useSharedHero(initial);
+  const d = (liveStore ?? initial) as HeroData;
   const { priceHistory } = usePriceHistory('1d');
-
-  useEffect(() => {
-    mounted.current = true;
-    let intervalId: ReturnType<typeof setInterval> | null = null;
-
-    async function poll() {
-      try {
-        const res = await fetch('/api/v2/home/hero?fresh=1', { cache: 'no-store' });
-        const json = await res.json();
-        if (json.success && json.data && mounted.current) {
-          setData((d) => ({ ...d, ...json.data, updatedAt: json.updatedAt }));
-          setLive(true);
-        }
-      } catch {
-        // keep previous data
-      }
-    }
-
-    poll();
-    intervalId = setInterval(poll, POLL_MS);
-
-    return () => {
-      mounted.current = false;
-      if (intervalId) clearInterval(intervalId);
-    };
-  }, []);
 
   const priceSparkline: SparklineDataPoint[] = useMemo(
     () => priceHistory.map((p) => ({ time: p.time, value: p.close })),
@@ -133,24 +99,24 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
   );
 
   const values: Record<string, string> = useMemo(() => ({
-    price: fmtUsd(data.priceUsd),
-    mcap: data.market_cap_usd ? fmtMoneyCompact(data.market_cap_usd) : '\u2014',
-    block: data.latest_block ? fmtInt(data.latest_block) : '\u2014',
-    circ: fmtCompact(data.total_circulating_supply),
-    supply: fmtCompact(data.total_supply),
-    locked: fmtCompact(data.total_locked),
-    tps: typeof data.tps === 'number' ? data.tps.toFixed(2) : '\u2014',
-  }), [data]);
+    price: fmtUsd(d.priceUsd),
+    mcap: d.market_cap_usd ? fmtMoneyCompact(d.market_cap_usd) : '\u2014',
+    block: d.latest_block ? fmtInt(d.latest_block) : '\u2014',
+    circ: fmtCompact(d.total_circulating_supply),
+    supply: fmtCompact(d.total_supply),
+    locked: fmtCompact(d.total_locked),
+    tps: typeof d.tps === 'number' ? d.tps.toFixed(2) : '\u2014',
+  }), [d]);
 
   const fullValues: Record<string, string> = useMemo(() => ({
-    price: fmtUsd(data.priceUsd),
-    mcap: data.market_cap_usd ? `$${fmtInt(data.market_cap_usd)}` : '\u2014',
-    block: data.latest_block ? fmtInt(data.latest_block) : '\u2014',
-    circ: `${fmtInt(data.total_circulating_supply)} Pi`,
-    supply: `${fmtInt(data.total_supply)} Pi`,
-    locked: `${fmtInt(data.total_locked)} Pi`,
-    tps: typeof data.tps === 'number' ? data.tps.toFixed(2) : '\u2014',
-  }), [data]);
+    price: fmtUsd(d.priceUsd),
+    mcap: d.market_cap_usd ? `$${fmtInt(d.market_cap_usd)}` : '\u2014',
+    block: d.latest_block ? fmtInt(d.latest_block) : '\u2014',
+    circ: `${fmtInt(d.total_circulating_supply)} Pi`,
+    supply: `${fmtInt(d.total_supply)} Pi`,
+    locked: `${fmtInt(d.total_locked)} Pi`,
+    tps: typeof d.tps === 'number' ? d.tps.toFixed(2) : '\u2014',
+  }), [d]);
 
   return (
     <section>
@@ -162,7 +128,7 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
             value={values[cfg.key]}
             fullValue={fullValues[cfg.key]}
             showChange={cfg.key === 'price' || cfg.key === 'mcap'}
-            changePct={cfg.key === 'price' ? data.priceChange24h : cfg.key === 'mcap' ? data.marketCapChange24h : undefined}
+            changePct={cfg.key === 'price' ? d.priceChange24h : cfg.key === 'mcap' ? d.marketCapChange24h : undefined}
             sparklineData={cfg.key === 'price' ? priceSparkline : null}
           />
         ))}
@@ -177,7 +143,7 @@ export function LiveHeroGrid({ initial }: { initial: HeroData }) {
             LIVE
           </span>
         )}
-        {data.updatedAt ? `Updated ${new Date(data.updatedAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'medium' })}` : ''}
+        {updatedAt ? `Updated ${new Date(updatedAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'medium' })}` : (d.updatedAt ? `Updated ${new Date(d.updatedAt).toLocaleString('en-US', { dateStyle: 'short', timeStyle: 'medium' })}` : '')}
       </p>
     </section>
   );

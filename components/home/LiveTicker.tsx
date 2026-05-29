@@ -3,12 +3,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { FlashValue } from './FlashValue';
+import { useSharedHero } from '@/lib/use-shared-hero';
 import {
-  fmtUsd,
-  fmtMoneyCompact,
-  fmtCompact,
-  fmtInt,
-  formatChange,
+  fmtUsd, fmtMoneyCompact, fmtCompact, fmtInt, formatChange,
 } from '@/lib/format';
 
 export type TickerHero = {
@@ -33,7 +30,6 @@ type TradeRecord = {
   counter_asset_code?: string;
 };
 
-const HERO_POLL_MS = 5000;
 const TRADES_POLL_MS = 30000;
 
 function estimateVolume(records: TradeRecord[], priceUsd: number): { volumeUsd: number; pairs: number } {
@@ -44,7 +40,6 @@ function estimateVolume(records: TradeRecord[], priceUsd: number): { volumeUsd: 
     const counterNative = t.counter_asset_type === 'native';
     if (baseNative) piVolume += parseFloat(t.base_amount || '0') || 0;
     else if (counterNative) piVolume += parseFloat(t.counter_amount || '0') || 0;
-
     const baseLabel = baseNative ? 'Pi' : t.base_asset_code || t.base_asset_type || '?';
     const counterLabel = counterNative ? 'Pi' : t.counter_asset_code || t.counter_asset_type || '?';
     pairSet.add(`${baseLabel}/${counterLabel}`);
@@ -82,40 +77,27 @@ function TickerCell({ item }: { item: TickerItem }) {
 }
 
 export function LiveTicker({
-  initialHero,
   initialVolumeUsd = null,
   initialPairs = null,
 }: {
-  initialHero: TickerHero;
   initialVolumeUsd?: number | null;
   initialPairs?: number | null;
 }) {
-  const [hero, setHero] = useState<TickerHero>(initialHero);
+  const { data: hero } = useSharedHero();
   const [volumeUsd, setVolumeUsd] = useState<number | null>(initialVolumeUsd);
   const [pairs, setPairs] = useState<number | null>(initialPairs);
   const mounted = useRef(true);
 
   useEffect(() => {
     mounted.current = true;
-    let heroId: ReturnType<typeof setInterval> | null = null;
     let tradesId: ReturnType<typeof setInterval> | null = null;
-
-    async function pollHero() {
-      try {
-        const res = await fetch('/api/v2/home/hero?fresh=1', { cache: 'no-store' });
-        const json = await res.json();
-        if (json?.success && json.data && mounted.current) setHero((h) => ({ ...h, ...json.data }));
-      } catch {
-        /* keep previous */
-      }
-    }
 
     async function pollTrades() {
       try {
         const res = await fetch('/api/v2/home/latest-trades', { cache: 'no-store' });
         const json = await res.json();
         if (json?.success && json.data?.records && mounted.current) {
-          const { volumeUsd: v, pairs: p } = estimateVolume(json.data.records, hero.priceUsd);
+          const { volumeUsd: v, pairs: p } = estimateVolume(json.data.records, hero?.priceUsd ?? 0);
           setVolumeUsd(v);
           setPairs(p);
         }
@@ -124,18 +106,17 @@ export function LiveTicker({
       }
     }
 
-    pollHero();
     pollTrades();
-    heroId = setInterval(pollHero, HERO_POLL_MS);
     tradesId = setInterval(pollTrades, TRADES_POLL_MS);
 
     return () => {
       mounted.current = false;
-      if (heroId) clearInterval(heroId);
       if (tradesId) clearInterval(tradesId);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hero?.priceUsd]);
+
+  if (!hero) return null;
 
   const items: TickerItem[] = [
     { label: 'PI Price', value: fmtUsd(hero.priceUsd), numeric: hero.priceUsd, change: hero.priceChange24h },
@@ -149,7 +130,6 @@ export function LiveTicker({
     { label: 'Block', value: `#${fmtInt(hero.latest_block)}`, numeric: hero.latest_block },
   ];
 
-  // Duplicate the items for a seamless marquee loop.
   const loop = [...items, ...items];
 
   return (
