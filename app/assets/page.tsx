@@ -22,14 +22,17 @@ interface AssetsApiResponse {
 export default function Assets() {
   const [stats, setStats] = useState({ total: 0, holders: 0, pools: 0, supply: 0 });
   const [initialLoading, setInitialLoading] = useState(true);
+  const hasInitialised = useState(() => false)[0]; // eslint-disable-line
 
-  const handleLoad = useCallback((data: AssetsApiResponse) => {
-    const records = data._embedded?.records || [];
-    const total = records.length;
-    const holders = records.reduce((s, a) => s + (a.accounts?.authorized || 0), 0);
-    const pools = records.reduce((s, a) => s + (a.num_liquidity_pools || 0), 0);
-    const supply = records.reduce((s, a) => s + parseFloat(a.balances?.authorized || "0"), 0);
-    setStats({ total, holders, pools, supply });
+  const handleLoad = useCallback((data: AssetsApiResponse, isInitial: boolean) => {
+    if (isInitial) {
+      const records = data._embedded?.records || [];
+      const total = records.length;
+      const holders = records.reduce((s, a) => s + (a.accounts?.authorized || 0), 0);
+      const pools = records.reduce((s, a) => s + (a.num_liquidity_pools || 0), 0);
+      const supply = records.reduce((s, a) => s + parseFloat(a.balances?.authorized || "0"), 0);
+      setStats({ total, holders, pools, supply });
+    }
     setInitialLoading(false);
   }, []);
 

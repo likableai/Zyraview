@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, Command, Home, BarChart3, Activity, Users, Book, AlertCircle } from 'lucide-react';
+import { Search, X, Command, Home, BarChart3, Activity, Users, Book, AlertCircle, Layers, Coins, Droplets, TrendingUp, ArrowRightLeft, ShieldCheck, Zap, Wallet, Globe, Calendar, Star, User } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -15,22 +15,38 @@ interface SearchResult {
 }
 
 const SEARCH_DATA: SearchResult[] = [
-  // Navigation
-  { id: '1', title: 'Home', description: 'Dashboard overview', href: '/', icon: <Home className="w-4 h-4" />, category: 'navigation' },
-  { id: '2', title: 'Explorer', description: 'Block explorer', href: '/block', icon: <BarChart3 className="w-4 h-4" />, category: 'navigation' },
-  { id: '3', title: 'Monitors', description: 'Wallet monitors', href: '/pct-wallet-monitor', icon: <Activity className="w-4 h-4" />, category: 'navigation' },
-  { id: '4', title: 'Community', description: 'Ecosystem & community', href: '/ecology', icon: <Users className="w-4 h-4" />, category: 'navigation' },
-  { id: '5', title: 'API', description: 'API documentation', href: '/api-documentation', icon: <Book className="w-4 h-4" />, category: 'navigation' },
-  
-  // Metrics
-  { id: '6', title: 'Price', description: 'Current market price', href: '/?metric=price', icon: <AlertCircle className="w-4 h-4" />, category: 'metric' },
-  { id: '7', title: 'Market Cap', description: 'Total market capitalization', href: '/?metric=mcap', icon: <AlertCircle className="w-4 h-4" />, category: 'metric' },
-  { id: '8', title: 'Supply', description: 'Circulating & total supply', href: '/?metric=supply', icon: <AlertCircle className="w-4 h-4" />, category: 'metric' },
-  
-  // Features
-  { id: '9', title: 'Charts', description: 'Price charts & analytics', href: '/?tab=overview', icon: <BarChart3 className="w-4 h-4" />, category: 'feature' },
-  { id: '10', title: 'Alerts', description: 'Price alerts & notifications', href: '/?feature=alerts', icon: <AlertCircle className="w-4 h-4" />, category: 'feature' },
-  { id: '11', title: 'Portfolio', description: 'Track your holdings', href: '/?feature=portfolio', icon: <Users className="w-4 h-4" />, category: 'feature' },
+  // Navigation — core pages
+  { id: 'home', title: 'Home', description: 'Dashboard overview', href: '/', icon: <Home className="w-4 h-4" />, category: 'navigation' },
+  { id: 'explorer', title: 'Block Explorer', description: 'Browse blocks ledgers', href: '/block', icon: <BarChart3 className="w-4 h-4" />, category: 'navigation' },
+  { id: 'txs', title: 'Transactions', description: 'Latest transactions', href: '/Transaction-list', icon: <ArrowRightLeft className="w-4 h-4" />, category: 'navigation' },
+  { id: 'ops', title: 'Operations', description: 'Latest operations', href: '/operations', icon: <Layers className="w-4 h-4" />, category: 'navigation' },
+  { id: 'trades', title: 'Trades History', description: 'Trade records', href: '/trades-history', icon: <TrendingUp className="w-4 h-4" />, category: 'navigation' },
+  // Markets
+  { id: 'assets', title: 'Assets', description: 'All issued assets on testnet', href: '/assets', icon: <Coins className="w-4 h-4" />, category: 'navigation' },
+  { id: 'pools', title: 'Liquidity Pools', description: 'All liquidity pools', href: '/pool', icon: <Droplets className="w-4 h-4" />, category: 'navigation' },
+  { id: 'stats', title: 'Network Stats', description: 'Account & supply stats', href: '/accountStats', icon: <Activity className="w-4 h-4" />, category: 'navigation' },
+  // Monitors
+  { id: 'pct', title: 'Core Team Monitor', description: 'PCT wallet tracker', href: '/pct-wallet-monitor', icon: <ShieldCheck className="w-4 h-4" />, category: 'navigation' },
+  { id: 'cex', title: 'Exchange Monitor', description: 'CEX wallet tracker', href: '/cex-wallet-monitor', icon: <ShieldCheck className="w-4 h-4" />, category: 'navigation' },
+  { id: 'realtime', title: 'Real-time Feed', description: 'Live tx/trades/ops', href: '/realtime-transactions', icon: <Zap className="w-4 h-4" />, category: 'navigation' },
+  // Ecosystem
+  { id: 'eco', title: 'Ecology Hub', description: 'Ecosystem & community', href: '/ecology', icon: <Globe className="w-4 h-4" />, category: 'navigation' },
+  { id: 'communities', title: 'Communities', description: 'Pi communities', href: '/ecosystem/communities', icon: <Users className="w-4 h-4" />, category: 'navigation' },
+  { id: 'events', title: 'Events', description: 'Ecosystem events', href: '/ecosystem/events', icon: <Calendar className="w-4 h-4" />, category: 'navigation' },
+  { id: 'hackathons', title: 'Hackathons', description: 'Ecosystem hackathons', href: '/ecosystem/hackathons', icon: <Star className="w-4 h-4" />, category: 'navigation' },
+  { id: 'influencers', title: 'Influencers', description: 'Pi influencers', href: '/ecosystem/influencers', icon: <Users className="w-4 h-4" />, category: 'navigation' },
+  // API & tools
+  { id: 'api-dash', title: 'API Dashboard', description: 'Manage API keys', href: '/api-dashboard', icon: <ShieldCheck className="w-4 h-4" />, category: 'navigation' },
+  { id: 'oracle', title: 'Oracle API', description: 'Get a price oracle key', href: '/oracle-api', icon: <Zap className="w-4 h-4" />, category: 'navigation' },
+  { id: 'api-docs', title: 'API Docs', description: 'API documentation', href: '/api-documentation', icon: <Book className="w-4 h-4" />, category: 'navigation' },
+  // Account
+  { id: 'profile', title: 'Profile', description: 'Your account & profile', href: '/profile', icon: <User className="w-4 h-4" />, category: 'navigation' },
+  { id: 'contact', title: 'Contact', description: 'Get in touch', href: '/contactUs', icon: <Book className="w-4 h-4" />, category: 'navigation' },
+  // Quick metrics
+  { id: 'mc-price', title: 'PI Price', description: 'Current PI/USD price', href: '/?tab=overview', icon: <TrendingUp className="w-4 h-4" />, category: 'metric' },
+  { id: 'mc-mcap', title: 'Market Cap', description: 'PI market cap & FDV', href: '/?tab=overview', icon: <TrendingUp className="w-4 h-4" />, category: 'metric' },
+  { id: 'mc-supply', title: 'Supply', description: 'Circulating, locked, total', href: '/?tab=supply', icon: <Coins className="w-4 h-4" />, category: 'metric' },
+  { id: 'mc-network', title: 'Network', description: 'Block, TPS, utilization', href: '/?tab=network', icon: <Activity className="w-4 h-4" />, category: 'metric' },
 ];
 
 export function GlobalSearch() {
@@ -45,7 +61,7 @@ export function GlobalSearch() {
   // Filter results based on query
   useEffect(() => {
     if (!query.trim()) {
-      setResults(SEARCH_DATA.slice(0, 8));
+      setResults(SEARCH_DATA.slice(0, 10));
       setSelectedIndex(0);
       return;
     }

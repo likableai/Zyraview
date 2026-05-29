@@ -12,6 +12,8 @@ interface AssetRecord {
   asset_issuer?: string;
   amount?: string;
   num_accounts?: number;
+  accounts?: { authorized?: number };
+  balances?: { authorized?: string };
   liquidity_pools_amount?: string;
 }
 
@@ -108,11 +110,13 @@ export function HomeRankedTables({
 
   const sortedAssets = useMemo(() => {
     const copy = [...assets];
-    copy.sort((a, b) =>
-      assetSort === 'holders'
-        ? (b.num_accounts ?? 0) - (a.num_accounts ?? 0)
-        : (parseFloat(b.amount ?? '0') || 0) - (parseFloat(a.amount ?? '0') || 0),
-    );
+    copy.sort((a, b) => {
+      const aHolders = a.num_accounts ?? a.accounts?.authorized ?? 0;
+      const bHolders = b.num_accounts ?? b.accounts?.authorized ?? 0;
+      const aSupply = parseFloat(String(a.amount ?? a.balances?.authorized ?? '0')) || 0;
+      const bSupply = parseFloat(String(b.amount ?? b.balances?.authorized ?? '0')) || 0;
+      return assetSort === 'holders' ? bHolders - aHolders : bSupply - aSupply;
+    });
     return copy.slice(0, 10);
   }, [assets, assetSort]);
 
@@ -169,17 +173,21 @@ export function HomeRankedTables({
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedAssets.map((a, i) => (
+                  {sortedAssets.map((a, i) => {
+                    const holders = a.num_accounts ?? a.accounts?.authorized ?? 0;
+                    const supplyRaw = parseFloat(String(a.amount ?? a.balances?.authorized ?? '0')) || 0;
+                    return (
                     <tr key={`${a.asset_code}-${a.asset_issuer}-${i}`} className="border-b border-border/20 last:border-0 hover:bg-muted/30">
                       <td className="px-3 py-2 text-muted-foreground text-xs">{i + 1}</td>
                       <td className="px-3 py-2">
                         <span className="font-semibold">{a.asset_code || (a.asset_type === 'native' ? 'Pi' : '?')}</span>
                         <span className="block text-[10px] text-muted-foreground font-mono">{shortHash(a.asset_issuer)}</span>
                       </td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">{fmtInt(a.num_accounts)}</td>
-                      <td className="px-3 py-2 text-right font-mono tabular-nums">{fmtCompact(parseFloat(a.amount ?? '0') || 0)}</td>
+                      <td className="px-3 py-2 text-right font-mono tabular-nums">{fmtInt(holders)}</td>
+                      <td className="px-3 py-2 text-right font-mono tabular-nums">{fmtCompact(supplyRaw)}</td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

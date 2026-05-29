@@ -27,7 +27,7 @@ interface FeedItem {
 }
 
 const POLL_MS = 7000;
-const MAX_ROWS = 14;
+const MAX_ROWS = 30;
 
 type Filter = 'all' | 'tx' | 'trade' | 'op';
 
@@ -160,7 +160,7 @@ export function LiveActivityFeed() {
         ) : error && visible.length === 0 ? (
           <p className="text-xs text-muted-foreground px-4 py-6 text-center">No live activity available right now.</p>
         ) : (
-          <div className="max-h-[340px] overflow-y-auto">
+          <div className="max-h-[600px] overflow-y-auto">
             {visible.map((it) => {
               const isNew = newIds.current.has(it._key) && !paused;
               const href = it._kind === 'tx' ? `/tx/${it.hash}`

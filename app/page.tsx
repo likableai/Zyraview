@@ -70,13 +70,25 @@ const TESTNET_HORIZON = 'https://api.testnet.minepi.com';
 
 async function fetchTestnetAssetsPools(): Promise<{ assets: AssetRecord[]; pools: PoolRecord[] }> {
   try {
-    const [assetsRes, poolsRes] = await Promise.all([
-      fetch(`${TESTNET_HORIZON}/assets?limit=100&order=desc`),
-      fetch(`${TESTNET_HORIZON}/liquidity_pools?limit=20&order=desc`),
+    // Fetch all pages of assets (up to 5 pages / 500 assets)
+    const allAssets: AssetRecord[] = [];
+    let assetUrl: string | null = `${TESTNET_HORIZON}/assets?limit=200&order=desc`;
+    let pages = 0;
+    while (assetUrl && pages < 5) {
+      const res: Response = await fetch(assetUrl);
+      const json: Record<string, unknown> = await res.json();
+      const records = (json._embedded as Record<string, unknown> | undefined)?.records as AssetRecord[] ?? [];
+      allAssets.push(...records);
+      assetUrl = ((json._links as Record<string, unknown> | undefined)?.next as Record<string, unknown> | undefined)?.href as string ?? null;
+      pages++;
+    }
+
+    const [poolsRes] = await Promise.all([
+      fetch(`${TESTNET_HORIZON}/liquidity_pools?limit=200&order=desc`),
     ]);
-    const [assetsJson, poolsJson] = await Promise.all([assetsRes.json(), poolsRes.json()]);
+    const poolsJson = await poolsRes.json();
     return {
-      assets: (assetsJson._embedded?.records ?? []) as AssetRecord[],
+      assets: allAssets,
       pools: (poolsJson._embedded?.records ?? []) as PoolRecord[],
     };
   } catch {

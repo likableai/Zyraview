@@ -10,20 +10,25 @@ import { HomeRankedTables } from '@/components/home/HomeRankedTables';
 import { HomeTopWallets } from '@/components/home/HomeTopWallets';
 import { LiveActivityFeed } from '@/components/home/LiveActivityFeed';
 import { HomeMonitorsDashboard } from '@/components/home/HomeMonitorsDashboard';
+import { HomePoolsTable } from '@/components/home/HomePoolsTable';
+import { HomeAssetStats } from '@/components/home/HomeAssetStats';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowUpRight, ArrowDownRight, Building2, Users, ExternalLink, Activity } from 'lucide-react';
 import type { SnapshotResponse } from '@/lib/server-fetch';
 
-type TabType = 'overview' | 'supply' | 'network' | 'monitors' | 'ecosystem' | 'transactions';
+type TabType = 'overview' | 'wallets' | 'transactions' | 'assets' | 'pools' | 'supply' | 'network' | 'monitors' | 'ecosystem';
 type MonitorSubTab = 'pct' | 'cex';
 
 const tabs: { id: TabType; label: string }[] = [
   { id: 'overview', label: 'Overview' },
+  { id: 'wallets', label: 'Wallets' },
+  { id: 'transactions', label: 'Transactions' },
+  { id: 'assets', label: 'Assets' },
+  { id: 'pools', label: 'Pools' },
   { id: 'supply', label: 'Supply' },
   { id: 'network', label: 'Network' },
   { id: 'monitors', label: 'Monitors' },
   { id: 'ecosystem', label: 'Ecosystem' },
-  { id: 'transactions', label: 'Transactions' },
 ];
 
 type HeroData = {
@@ -161,9 +166,17 @@ export function HomePage({
                 )}
               </section>
 
+              {/* Network Activity — commented: requires PCT/CEX wallet monitors to be seeded with addresses */}
+              {/*
               <section className="space-y-3">
                 <h2 className="text-lg sm:text-xl font-bold text-foreground">Network Activity</h2>
                 <PulseSectionContent data={pulseData} />
+              </section>
+              */}
+
+              <section className="space-y-3">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground">Testnet Assets & Pools</h2>
+                <HomeAssetStats assets={assets} pools={pools} />
               </section>
 
               <section className="space-y-3">
@@ -172,21 +185,83 @@ export function HomePage({
               </section>
 
               <section className="space-y-3">
-                <h2 className="text-lg sm:text-xl font-bold text-foreground">Wallets & Live Activity</h2>
-                <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
-                  <div className="lg:col-span-2">
-                    {walletsData ? (
-                      <HomeTopWallets wallets={walletsData.wallets} />
-                    ) : (
-                      <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
-                        Wallet leaderboard temporarily unavailable.
-                      </section>
-                    )}
-                  </div>
-                  <div className="lg:col-span-1">
-                    <LiveActivityFeed />
-                  </div>
-                </div>
+                <h2 className="text-lg sm:text-xl font-bold text-foreground">Wallets</h2>
+                {walletsData ? (
+                  <HomeTopWallets wallets={walletsData.wallets} />
+                ) : (
+                  <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
+                    Wallet leaderboard temporarily unavailable.
+                  </section>
+                )}
+              </section>
+
+              <section className="space-y-3">
+                <h2 className="text-lg sm:text-xl font-bold text-foreground flex items-center gap-2">
+                  Live Activity
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                  </span>
+                </h2>
+                <LiveActivityFeed />
+              </section>
+            </div>
+          )}
+
+          {/* Wallets Tab */}
+          {activeTab === 'wallets' && (
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
+              <section className="space-y-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Top Tracked Wallets</h2>
+                <p className="text-sm text-muted-foreground">
+                  Wallet leaderboard ranked by balance. Data sourced from the backend wallet monitoring system.
+                </p>
+                {walletsData ? (
+                  <HomeTopWallets wallets={walletsData.wallets} />
+                ) : (
+                  <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
+                    Wallet leaderboard temporarily unavailable.
+                  </section>
+                )}
+              </section>
+            </div>
+          )}
+
+          {/* Transactions Tab */}
+          {activeTab === 'transactions' && (
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
+              <section className="space-y-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Real-time Activity</h2>
+                <LiveActivityFeed />
+              </section>
+            </div>
+          )}
+
+          {/* Assets Tab */}
+          {activeTab === 'assets' && (
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
+              <section className="space-y-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Testnet Assets &amp; Pools</h2>
+                <p className="text-sm text-muted-foreground">
+                  Aggregated from Pi Network testnet Horizon. Mainnet has no issued assets yet.
+                </p>
+                <HomeAssetStats assets={assets} pools={pools} />
+              </section>
+              <section className="space-y-3">
+                <HomeRankedTables assetsInitial={assets} poolsInitial={pools} />
+              </section>
+            </div>
+          )}
+
+          {/* Pools Tab */}
+          {activeTab === 'pools' && (
+            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
+              <section className="space-y-3">
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Liquidity Pools</h2>
+                <p className="text-sm text-muted-foreground">
+                  All liquidity pools on Pi Network testnet.
+                </p>
+                <HomePoolsTable pools={pools} />
               </section>
             </div>
           )}
@@ -208,7 +283,7 @@ export function HomePage({
             </div>
           )}
 
-          {/* Network Tab */}
+          {/* Network Tab — Network Activity commented */}
           {activeTab === 'network' && (
             <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
               <section className="space-y-3">
@@ -221,23 +296,16 @@ export function HomePage({
                   </section>
                 )}
               </section>
+              {/* Network Activity commented — requires backend monitor seeding */}
+              {/*
               <section className="space-y-3">
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground">Network Activity</h3>
                 <PulseSectionContent data={pulseData} />
               </section>
+              */}
               <section className="space-y-3">
                 <h3 className="text-xl sm:text-2xl font-bold text-foreground">On-chain Rankings</h3>
                 <HomeRankedTables assetsInitial={assets} poolsInitial={pools} />
-              </section>
-            </div>
-          )}
-
-          {/* Ecosystem Tab */}
-          {activeTab === 'ecosystem' && (
-            <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
-              <section className="space-y-3">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Community & Ecosystem</h2>
-                {ecoData ? <EcosystemSectionContent data={ecoData} /> : ecosystemFallback}
               </section>
             </div>
           )}
@@ -277,28 +345,16 @@ export function HomePage({
             </div>
           )}
 
-          {/* Transactions Tab */}
-          {activeTab === 'transactions' && (
+          {/* Ecosystem Tab */}
+          {activeTab === 'ecosystem' && (
             <div className="space-y-6 sm:space-y-8 animate-in fade-in-0">
               <section className="space-y-3">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Real-time Activity</h2>
-                <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-3">
-                  <div className="lg:col-span-1">
-                    <LiveActivityFeed />
-                  </div>
-                  <div className="lg:col-span-2">
-                    {walletsData ? (
-                      <HomeTopWallets wallets={walletsData.wallets} />
-                    ) : (
-                      <section className="rounded border border-dashed border-border p-5 text-sm text-muted-foreground text-center">
-                        Wallet leaderboard temporarily unavailable.
-                      </section>
-                    )}
-                  </div>
-                </div>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground">Community & Ecosystem</h2>
+                {ecoData ? <EcosystemSectionContent data={ecoData} /> : ecosystemFallback}
               </section>
             </div>
           )}
+
         </div>
       </main>
     </>

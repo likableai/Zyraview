@@ -23,7 +23,7 @@ interface AssetsApiResponse {
 }
 
 interface AssetsTabProps {
-  onLoad?: (data: AssetsApiResponse) => void;
+  onLoad?: (data: AssetsApiResponse, isInitial: boolean) => void;
 }
 
 export default function AssetsTab({ onLoad }: AssetsTabProps) {
@@ -56,41 +56,45 @@ export default function AssetsTab({ onLoad }: AssetsTabProps) {
   const fetchAssets = async (url?: string) => {
     try {
       setLoading(true);
-      // Prefer snapshot (server prefetch) when no pagination link is provided
       if (!url) {
-        try {
-          const r = await fetch('/api/v2/home/assets-pools');
-          const j = await r.json();
-          const assets = j?.data?.assets;
-          // Only use snapshot if it has actual data (mainnet returns empty arrays = no assets)
-          const records = assets?._embedded?.records as Asset[] | undefined;
-          if (j?.success && records && records.length > 0) {
-            const data = assets as AssetsApiResponse;
-            setAssetsData(data);
-            onLoad?.(data);
-            setLoading(false);
-            return;
-          }
-        } catch {
-          /* fallback to direct testnet horizon */
+        // Initial load: fetch ALL pages for accurate aggregate stats
+        const allRecords: Asset[] = [];
+        let nextUrl: string | null = 'https://api.testnet.minepi.com/assets?limit=200&order=desc';
+        let pages = 0;
+        while (nextUrl && pages < 5) {
+          const r: Response = await fetch(nextUrl);
+          const j: Record<string, unknown> = await r.json();
+          const recs = ((j._embedded as Record<string, unknown> | undefined)?.records ?? []) as Asset[];
+          allRecords.push(...recs);
+          nextUrl = ((j._links as Record<string, unknown> | undefined)?.next as Record<string, unknown> | undefined)?.href as string ?? null;
+          pages++;
         }
-      }
-
-      const apiUrl = url || 'https://api.testnet.minepi.com/assets?limit=100';
-      const cacheKey = `assets_${btoa(apiUrl)}`;
-      const cached = getCached(cacheKey);
-      if (cached) {
-        setAssetsData(cached);
-        onLoad?.(cached);
+        // Build a synthetic API response with all records
+        const fullData: AssetsApiResponse = {
+          _links: { self: { href: '' } },
+          _embedded: { records: allRecords },
+        };
+        setAssetsData(fullData);
+        onLoad?.(fullData, true);
         setLoading(false);
         return;
       }
-      const response = await fetch(apiUrl);
+
+      // Pagination: fetch single page
+      const cacheKey = `assets_${btoa(url)}`;
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setAssetsData(cached);
+        onLoad?.(cached, false);
+        setLoading(false);
+        return;
+      }
+      const response = await fetch(url);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data: AssetsApiResponse = await response.json();
       setCached(cacheKey, data);
       setAssetsData(data);
-      onLoad?.(data);
+      onLoad?.(data, false);
     } catch (err) {
       setError(`Failed to fetch assets data: ${err instanceof Error ? err.message : String(err)}`);
     } finally {

@@ -14,6 +14,8 @@ import { BackgroundAnimation } from '@/components/BackgroundAnimation';
 import Script from 'next/script';
 import type { Metadata, Viewport } from "next";
 import MobilePiWelcome from "@/components/MobilePiWelcome";
+import { Sidebar } from "@/components/Sidebar";
+import { PiBrowserBanner } from "@/components/PiBrowserBanner";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'localhost:3000'),
@@ -52,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}
       </Script>
+        <PiBrowserBanner />
         <BackgroundAnimation />
         <ThemeProvider defaultTheme="system">
           <PiNetworkProvider>
@@ -62,11 +65,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     <MobilePiWelcome />
                       <NavbarWithMobile />
                       <GlobalMobileElements />
-                      <div className="flex min-h-screen flex-col">
-                        <main className="flex-1 pb-safe-area-mobile lg:pb-0">
-                          {children}
-                        </main>
-                      <GlobalFooter />
+                      <div className="flex min-h-screen">
+                        <Sidebar />
+                        <div className="flex flex-col flex-1 min-w-0">
+                          <main className="flex-1 pb-safe-area-mobile lg:pb-0">
+                            {children}
+                          </main>
+                          <GlobalFooter />
+                        </div>
                       </div>
                     <ToastContainer />
                   </ToastProvider>
