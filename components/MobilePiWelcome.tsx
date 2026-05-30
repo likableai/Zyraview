@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Plug, Loader2, CheckCircle, AlertCircle, X, ExternalLink } from 'lucide-react';
+import { Plug, Loader2, CheckCircle, AlertCircle, X } from 'lucide-react';
 import { usePiNetwork } from '@/context/PiNetworkContext';
-import { openInPiBrowser, isPiBrowser, detectPlatform } from '@/lib/pi-browser-deeplink';
 
 interface MobilePiWelcomeProps {
   onAuthSuccess?: (user: any) => void;
@@ -18,21 +17,13 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
   const [authStep, setAuthStep] = useState<string>('');
   const [authSuccess, setAuthSuccess] = useState(false);
   const [showReason, setShowReason] = useState<string>('');
-  const [piSdkAvailable, setPiSdkAvailable] = useState(true);
-  const [platform, setPlatform] = useState<ReturnType<typeof detectPlatform>>('desktop');
   const { user, isAuthenticated, authenticate } = usePiNetwork();
 
-  // Check if mobile on client side only to avoid hydration issues
   useEffect(() => {
     const checkMobile = () => {
       const isMobile = window.innerWidth <= 768;
 
-      // Detect Pi SDK availability
-      setPiSdkAvailable(isPiBrowser());
-      setPlatform(detectPlatform());
-
       if (isMobile && !isAuthenticated) {
-        // Check if user has ever authenticated before
         const hasAuthenticatedBefore = localStorage.getItem('pi_has_authenticated');
         const savedToken = localStorage.getItem('pi_access_token');
         const savedUser = localStorage.getItem('pi_user');
@@ -41,37 +32,27 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
         let reason = '';
         
         if (!hasAuthenticatedBefore) {
-          // First-time user
           shouldShow = true;
           reason = 'Welcome! Connect your Pi wallet to get started.';
         } else if (savedToken && savedUser) {
-          // User has authenticated before but token might be expired
-          // We'll let the PiNetworkContext handle token verification
-          // If verification fails, the context will clear the token
-          // and we should show the popup
           shouldShow = true;
           reason = 'Your session has expired. Please reconnect your Pi wallet.';
         } else {
-          // User has authenticated before but no saved token
           shouldShow = true;
           reason = 'Please reconnect your Pi wallet to continue.';
         }
         
         if (shouldShow) {
           setShowReason(reason);
-          // Small delay to ensure component is fully mounted
           setTimeout(() => setIsVisible(true), 100);
         }
       } else if (isAuthenticated) {
-        // Hide modal if user is already authenticated
         setIsVisible(false);
       }
     };
 
-    // Only run on client side
     checkMobile();
 
-    // Handle window resize/orientation changes
     window.addEventListener('resize', checkMobile);
     window.addEventListener('orientationchange', checkMobile);
     
@@ -81,15 +62,13 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
     };
   }, [isAuthenticated]);
 
-  // Auto-close when authentication is successful
   useEffect(() => {
     if (isAuthenticated && authSuccess) {
       console.log('Auto-closing modal after successful authentication');
-      // Mark that user has authenticated before
       localStorage.setItem('pi_has_authenticated', 'true');
       const timer = setTimeout(() => {
         handleClose();
-      }, 1500); // Reduced from 2000ms to 1500ms for better UX
+      }, 1500);
       
       return () => clearTimeout(timer);
     }
@@ -98,16 +77,10 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
   const handlePiAuth = async () => {
     setError(null);
     setLocalLoading(true);
-    setAuthStep('Checking Pi Browser...');
+    setAuthStep('Connecting to Pi Network...');
     setAuthSuccess(false);
 
     try {
-      // Check if Pi SDK is available first
-      if (!isPiBrowser()) {
-        throw new Error('Pi SDK not available. Please open this app in Pi Browser.');
-      }
-
-      setAuthStep('Connecting to Pi Network...');
       console.log('Starting Pi authentication...');
       
       await authenticate();
@@ -123,13 +96,10 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
       setAuthStep('');
       setAuthSuccess(false);
       
-      // Provide more specific error messages for mobile Pi Browser
       let errorMessage = 'Authentication failed. Please try again.';
       
       if (err.message) {
-        if (err.message.includes('Pi SDK not available')) {
-          errorMessage = 'Please open this app in Pi Browser to connect your wallet.';
-        } else if (err.message.includes('Pi Network authentication failed')) {
+        if (err.message.includes('Pi Network authentication failed')) {
           errorMessage = 'Pi Network connection failed. Please check your internet connection and try again.';
         } else if (err.message.includes('Failed to load Pi SDK')) {
           errorMessage = 'Unable to load Pi SDK. Please refresh the page and try again.';
@@ -144,10 +114,6 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
     }
   };
 
-  const handleOpenPiBrowser = () => {
-    openInPiBrowser();
-  };
-
   const handleClose = () => {
     console.log('Closing MobilePiWelcome modal');
     setIsVisible(false);
@@ -158,7 +124,7 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
   };
 
   const handleSkip = () => {
-    console.log('⏭️ Skipping Pi authentication');
+    console.log('Skipping Pi authentication');
     setIsVisible(false);
     setAuthSuccess(false);
     setError(null);
@@ -207,8 +173,15 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
                 Your Pi wallet is now connected
               </p>
             </div>
-          ) : piSdkAvailable ? (
+          ) : (
             <div className="space-y-3">
+              {error && (
+                <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
+                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
+
               <Button 
                 onClick={handlePiAuth} 
                 disabled={localLoading}
@@ -234,44 +207,6 @@ export function MobilePiWelcome({ onAuthSuccess, onClose }: MobilePiWelcomeProps
                 disabled={localLoading}
               >
                 Maybe Later
-              </Button>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {/* Pi SDK not available - show Open in Pi Browser button */}
-              {error && (
-                <div className="flex items-center gap-2 text-red-500 text-sm bg-red-50 dark:bg-red-950/20 p-3 rounded-lg border border-red-200 dark:border-red-800">
-                  <AlertCircle className="h-4 w-4 flex-shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
-
-              <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 text-sm text-amber-800 dark:text-amber-200">
-                Pi Browser is required to connect your wallet. You're currently on a regular browser.
-              </div>
-
-              <Button
-                onClick={handleOpenPiBrowser}
-                className="w-full font-semibold bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                {platform === 'desktop'
-                  ? 'Continue in Browser'
-                  : 'Open in Pi Browser'}
-              </Button>
-
-              <p className="text-xs text-center text-muted-foreground">
-                {platform === 'desktop'
-                  ? 'Pi Browser is mobile-only. You can still browse without a wallet.'
-                  : 'You\'ll be redirected to Pi Browser. Come back to this page after opening.'}
-              </p>
-
-              <Button
-                onClick={handleSkip}
-                variant="ghost"
-                className="w-full text-muted-foreground hover:text-foreground"
-              >
-                Continue without wallet
               </Button>
             </div>
           )}

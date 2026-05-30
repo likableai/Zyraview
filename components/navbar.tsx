@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { FiX } from "react-icons/fi";
 import { Menu, Plug, CheckCircle, ChevronDown } from "lucide-react";
 import { usePiNetwork } from "@/context/PiNetworkContext";
-import { openInPiBrowser, isPiBrowser } from "@/lib/pi-browser-deeplink";
 import Logo from './logo';
 import { ModeToggle } from '@/components/ui/mode-toggle';
 import { GlobalSearch } from '@/components/GlobalSearch';
@@ -105,18 +104,14 @@ const Navbar: React.FC = () => {
                 <div className="pt-6 border-t border-border mt-6">
                   <button
                     onClick={async () => {
-                      if (isPiBrowser()) {
-                        try { await authenticate(); } catch {}
-                      } else {
-                        openInPiBrowser();
-                      }
+                      try { await authenticate(); } catch {}
                       setShowMobileMenu(false);
                     }}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-lg bg-accent text-accent-foreground font-semibold text-sm hover:bg-accent/90 interactive-element"
                   >
                     <span className="flex items-center gap-2">
                       <Plug className="w-4 h-4" />
-                      {isAuthenticated ? 'Connected' : isPiBrowser() ? 'Connect' : 'Open in Pi Browser'}
+                      {isAuthenticated ? 'Connected' : 'Connect'}
                     </span>
                     {isAuthenticated && <CheckCircle className="w-4 h-4" />}
                   </button>
@@ -140,10 +135,8 @@ const MobileBottomNav: React.FC = () => {
     try {
       if (isAuthenticated) {
         logout();
-      } else if (isPiBrowser()) {
-        await authenticate();
       } else {
-        openInPiBrowser();
+        await authenticate();
       }
     } catch (error) {
       console.error('Pi authentication failed:', error);

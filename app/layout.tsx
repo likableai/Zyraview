@@ -15,7 +15,6 @@ import Script from 'next/script';
 import type { Metadata, Viewport } from "next";
 import MobilePiWelcome from "@/components/MobilePiWelcome";
 import { Sidebar } from "@/components/Sidebar";
-import { PiBrowserBanner } from "@/components/PiBrowserBanner";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || 'localhost:3000'),
@@ -54,7 +53,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           })();
         `}
       </Script>
-        <PiBrowserBanner />
         <BackgroundAnimation />
         <ThemeProvider defaultTheme="system">
           <PiNetworkProvider>
